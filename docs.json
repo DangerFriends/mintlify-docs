@@ -99,7 +99,7 @@
   "navbar": {
     "links": [
       {
-        "label": "",
+        "label": "Fucks or Not",
         "href": "https://fucksornot.com"
       }
     ],
@@ -123,5 +123,11 @@
   },
   "fonts": {
     "family": "Roboto"
+  },
+  "styling": {
+    "eyebrows": "section"
+  },
+  "icons": {
+    "library": "fontawesome"
   }
 }
