@@ -99,8 +99,8 @@
   "navbar": {
     "links": [
       {
-        "label": "Support",
-        "href": "mailto:support@fucksornot.com"
+        "label": "",
+        "href": "https://fucksornot.com"
       }
     ],
     "primary": {
@@ -114,5 +114,14 @@
     "auth": {
       "method": "bearer"
     }
+  },
+  "background": {
+    "decoration": "gradient"
+  },
+  "appearance": {
+    "default": "system"
+  },
+  "fonts": {
+    "family": "Roboto"
   }
 }
