@@ -102,12 +102,7 @@
         "label": "Fucks or Not",
         "href": "https://fucksornot.com"
       }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://fucksornot.com/dashboard"
-    }
+    ]
   },
   "api": {
     "baseUrl": "https://api.fucksornot.com",
