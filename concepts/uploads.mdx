@@ -1,0 +1,148 @@
+---
+title: 'Uploads'
+description: 'Understanding the FoN upload system'
+---
+
+## Overview
+
+Uploads are the core content type in FoN. Users can upload images or submit links for the community to vote on.
+
+## Upload Types
+
+FoN supports three types of uploads:
+
+### Image Upload
+
+Upload an image file directly to FoN.
+
+**Supported formats:** JPEG, PNG, GIF, WebP
+
+**Size limit:** 10 MB
+
+```bash
+curl -X POST https://api.fon.app/api/v1/upload \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -F "upload_type=image" \
+  -F "description=Check out this gadget" \
+  -F "file=@/path/to/image.jpg"
+```
+
+### Image URL
+
+Submit a URL to an image hosted elsewhere. FoN will fetch and process the image.
+
+```bash
+curl -X POST https://api.fon.app/api/v1/upload \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -F "upload_type=image_url" \
+  -F "description=Cool find from the web" \
+  -F "image_url=https://example.com/image.jpg"
+```
+
+### Link
+
+Submit a link to external content. FoN supports rich embeds for popular platforms.
+
+**Supported platforms:**
+- Bluesky
+- Instagram
+- Threads
+- YouTube
+- Tumblr
+- Spotify
+
+```bash
+curl -X POST https://api.fon.app/api/v1/upload \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -F "upload_type=link" \
+  -F "description=Great video" \
+  -F "external_url=https://youtube.com/watch?v=..."
+```
+
+## Upload Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | UUID | Unique identifier |
+| `user_id` | UUID | Owner's user ID |
+| `filename` | string | Stored filename (images only) |
+| `original_name` | string | Original filename |
+| `description` | string | User-provided description (max 500 chars) |
+| `upload_type` | string | `image` or `link` |
+| `external_url` | string | URL for links |
+| `upvotes` | integer | Number of "fucks" votes |
+| `downvote_count` | integer | Number of "does not fuck" votes |
+| `is_private` | boolean | Privacy status |
+| `tags` | array | Associated tags |
+| `created_at` | timestamp | Creation time |
+
+## Duplicate Detection
+
+FoN automatically detects duplicate image uploads using content hashing. If you upload an image that already exists, you'll receive:
+
+```json
+{
+  "duplicate": true,
+  "existingUploadId": "uuid-of-existing-upload",
+  "message": "This image has already been uploaded"
+}
+```
+
+## Image Processing
+
+Uploaded images are automatically:
+
+1. **Validated** - Checked for supported format and size
+2. **Analyzed** - Scanned for content (human detection)
+3. **Optimized** - Converted to efficient formats
+4. **Thumbnailed** - Generated preview versions
+
+## Privacy
+
+Uploads can be set as private:
+
+```bash
+curl -X PATCH https://api.fon.app/api/upload/UPLOAD_ID/privacy \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"is_private": true}'
+```
+
+Private uploads:
+- Don't appear in public feeds
+- Only visible to the owner and admins
+- Still accessible via direct link (if you know the ID)
+
+## Tags
+
+Add tags to help categorize your upload:
+
+```bash
+curl -X POST https://api.fon.app/api/v1/upload \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -F "upload_type=image" \
+  -F "description=My upload" \
+  -F "tags=gadget,tech,cool" \
+  -F "file=@image.jpg"
+```
+
+**Tag limits:**
+- Maximum 10 tags per upload
+- Tags are comma-separated
+
+## Rate Limits
+
+Uploads are rate limited to **20 per hour** per user to prevent abuse.
+
+## Deleting Uploads
+
+Users can delete their own uploads:
+
+```bash
+curl -X DELETE https://api.fon.app/api/upload/UPLOAD_ID \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+<Warning>
+  Deletion is permanent and cannot be undone.
+</Warning>

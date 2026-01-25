@@ -1,0 +1,130 @@
+---
+title: 'Multi-Factor Authentication'
+description: 'Setup and manage MFA for enhanced security'
+---
+
+## Setup MFA
+
+Initialize MFA setup for the authenticated user.
+
+### Request
+
+```bash
+curl -X POST https://api.fon.app/api/auth/mfa/setup \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+### Response
+
+```json
+{
+  "qrCode": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...",
+  "secret": "JBSWY3DPEHPK3PXP",
+  "backupCodes": [
+    "abc123def456",
+    "ghi789jkl012",
+    "mno345pqr678",
+    "stu901vwx234",
+    "yza567bcd890",
+    "efg123hij456",
+    "klm789nop012",
+    "qrs345tuv678"
+  ]
+}
+```
+
+### Fields
+
+| Field | Description |
+|-------|-------------|
+| `qrCode` | Base64 encoded QR code image to scan with authenticator app |
+| `secret` | TOTP secret for manual entry if QR scanning fails |
+| `backupCodes` | One-time use codes for account recovery (8 codes, 12 characters each) |
+
+<Warning>
+  Save your backup codes securely. They cannot be retrieved later and are needed if you lose access to your authenticator app.
+</Warning>
+
+---
+
+## Verify MFA Setup
+
+Complete MFA setup by verifying a TOTP code from your authenticator app.
+
+### Request
+
+```bash
+curl -X POST https://api.fon.app/api/auth/mfa/verify \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"mfaCode": "123456"}'
+```
+
+### Response
+
+```json
+{
+  "success": true
+}
+```
+
+After verification, MFA is enabled on your account and required for login.
+
+---
+
+## Disable MFA
+
+Disable MFA on your account. Requires a valid MFA code.
+
+### Request
+
+```bash
+curl -X POST https://api.fon.app/api/auth/mfa/disable \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"mfaCode": "123456"}'
+```
+
+### Response
+
+```json
+{
+  "success": true
+}
+```
+
+---
+
+## Using MFA with Login
+
+When MFA is enabled, include the code in your login request:
+
+```json
+{
+  "action": "login",
+  "email": "user@example.com",
+  "password": "password",
+  "mfaCode": "123456"
+}
+```
+
+If you don't include the code, you'll receive:
+
+```json
+{
+  "mfaRequired": true
+}
+```
+
+## Backup Codes
+
+Backup codes can be used in place of TOTP codes. Each code can only be used once.
+
+```json
+{
+  "action": "login",
+  "email": "user@example.com",
+  "password": "password",
+  "mfaCode": "abc123def456"
+}
+```

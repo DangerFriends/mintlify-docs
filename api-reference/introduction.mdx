@@ -1,33 +1,175 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: 'API Reference'
+description: 'Complete reference for the FoN API'
 ---
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
+## Overview
 
-## Welcome
+The FoN API is a RESTful API that allows you to interact with the FoN platform programmatically. All requests should be made to the base URL:
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
-
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+```
+https://api.fon.app
+```
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+Most endpoints require authentication. The API supports multiple authentication methods:
+
+<CardGroup cols={2}>
+  <Card title="Bearer Token" icon="key">
+    Pass a JWT or API token in the `Authorization` header
+  </Card>
+  <Card title="Cookie" icon="cookie">
+    Session cookie (`auth-token`) for browser-based requests
+  </Card>
+</CardGroup>
+
+```bash
+# Using Bearer token
+curl https://api.fon.app/api/profile \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+## Request Format
+
+### JSON Requests
+
+For endpoints that accept JSON, set the `Content-Type` header:
+
+```bash
+curl -X POST https://api.fon.app/api/auth \
+  -H "Content-Type: application/json" \
+  -d '{"action": "login", "email": "...", "password": "..."}'
+```
+
+### Form Data
+
+For file uploads, use `multipart/form-data`:
+
+```bash
+curl -X POST https://api.fon.app/api/upload \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -F "upload_type=image" \
+  -F "description=My upload" \
+  -F "file=@image.jpg"
+```
+
+## Response Format
+
+All responses are returned as JSON:
 
 ```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+{
+  "data": { ... },
+  "error": null
+}
 ```
+
+### Error Responses
+
+Errors include a message describing the issue:
+
+```json
+{
+  "error": "unauthorized",
+  "message": "Invalid or expired token"
+}
+```
+
+## HTTP Status Codes
+
+| Code | Description |
+|------|-------------|
+| `200` | Success |
+| `304` | Not Modified (cached) |
+| `400` | Bad Request - Invalid input |
+| `401` | Unauthorized - Authentication required |
+| `403` | Forbidden - Insufficient permissions |
+| `404` | Not Found - Resource doesn't exist |
+| `413` | Payload Too Large - File exceeds limit |
+| `429` | Too Many Requests - Rate limited |
+| `500` | Internal Server Error |
+
+## Rate Limits
+
+The API enforces rate limits to ensure fair usage:
+
+| Endpoint Category | Limit | Window |
+|-------------------|-------|--------|
+| Authentication | 5 requests | 15 minutes |
+| Uploads | 20 requests | 1 hour |
+| Voting | 20 requests | 1 hour |
+| General | Standard | Rolling window |
+
+When rate limited, you'll receive a `429` response with a `Retry-After` header.
+
+## Pagination
+
+List endpoints support pagination via query parameters:
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `page` | integer | 1 | Page number (1-indexed) |
+| `limit` | integer | 12 | Items per page (max 50) |
+
+```bash
+curl "https://api.fon.app/api/uploads?page=2&limit=20"
+```
+
+Response includes pagination info:
+
+```json
+{
+  "uploads": [...],
+  "page": 2,
+  "limit": 20
+}
+```
+
+## Caching
+
+The API uses caching to improve performance:
+
+| Endpoint | Cache Duration |
+|----------|----------------|
+| `/api/uploads` | 2 minutes |
+| `/api/items-recent` | 5 minutes |
+| `/api/profile` | 30 seconds |
+| `/api/image/{id}` | 1 year (public) |
+
+Use the `ETag` header for conditional requests.
+
+## OpenAPI Specification
+
+The complete API is documented using OpenAPI 3.1. You can:
+
+<Card
+  title="View OpenAPI Spec"
+  icon="file-code"
+  href="/api-reference/openapi.json"
+>
+  Download the full OpenAPI specification
+</Card>
+
+## Endpoints
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="lock" href="/api-reference/auth/register-login">
+    User registration, login, and session management
+  </Card>
+  <Card title="Uploads" icon="upload" href="/api-reference/uploads/create">
+    Create, manage, and browse uploads
+  </Card>
+  <Card title="Voting" icon="thumbs-up" href="/api-reference/voting/submit-vote">
+    Vote on content
+  </Card>
+  <Card title="Tags" icon="tag" href="/api-reference/tags/list">
+    Tag management and discovery
+  </Card>
+  <Card title="Media" icon="image" href="/api-reference/media/images">
+    Image and thumbnail retrieval
+  </Card>
+  <Card title="Admin" icon="shield" href="/api-reference/admin/overview">
+    Administrative operations
+  </Card>
+</CardGroup>

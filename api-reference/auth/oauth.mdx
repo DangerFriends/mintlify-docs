@@ -1,0 +1,108 @@
+---
+title: 'OAuth Authentication'
+description: 'Sign in with Google, Apple, or Meta'
+---
+
+FoN supports OAuth 2.0 authentication with major providers.
+
+## Supported Providers
+
+| Provider | Initiation Endpoint | Callback Endpoint |
+|----------|---------------------|-------------------|
+| Google | `GET /api/auth/oauth/google` | `GET /api/auth/callback/google` |
+| Apple | `GET /api/auth/oauth/apple` | `GET /api/auth/callback/apple` |
+| Meta | `GET /api/auth/oauth/meta` | `GET /api/auth/callback/meta` |
+
+## OAuth Flow
+
+OAuth authentication follows the standard flow:
+
+<Steps>
+  <Step title="Initiate OAuth">
+    Redirect the user to the OAuth initiation endpoint:
+    ```
+    https://api.fon.app/api/auth/oauth/google
+    ```
+  </Step>
+  <Step title="User Authenticates">
+    User authenticates with the OAuth provider (Google, Apple, or Meta)
+  </Step>
+  <Step title="Callback">
+    Provider redirects back to FoN's callback endpoint with authorization code
+  </Step>
+  <Step title="Session Created">
+    FoN creates a session and redirects to the application with authentication cookie set
+  </Step>
+</Steps>
+
+## Implementation
+
+### Web Applications
+
+For web applications, simply link to the OAuth endpoint:
+
+```html
+<a href="https://api.fon.app/api/auth/oauth/google">
+  Sign in with Google
+</a>
+```
+
+### Single Page Applications
+
+For SPAs, open a popup or redirect:
+
+```javascript
+// Popup method
+const popup = window.open(
+  'https://api.fon.app/api/auth/oauth/google',
+  'oauth',
+  'width=500,height=600'
+);
+
+// Listen for the popup to close
+const interval = setInterval(() => {
+  if (popup.closed) {
+    clearInterval(interval);
+    // Check authentication status
+    checkAuth();
+  }
+}, 1000);
+```
+
+### Mobile Applications
+
+For mobile apps, use a webview or in-app browser:
+
+```javascript
+// React Native example with expo-web-browser
+import * as WebBrowser from 'expo-web-browser';
+
+const signInWithGoogle = async () => {
+  const result = await WebBrowser.openAuthSessionAsync(
+    'https://api.fon.app/api/auth/oauth/google',
+    'your-app://callback'
+  );
+};
+```
+
+## After OAuth
+
+After successful OAuth authentication:
+
+1. A session is created on FoN
+2. An `auth-token` cookie is set
+3. The user is redirected to your application
+
+Use the [Check Status](/api-reference/auth/check-status) endpoint to verify authentication:
+
+```bash
+curl https://api.fon.app/api/auth/check \
+  --cookie "auth-token=..."
+```
+
+## Notes
+
+- OAuth creates or links to a FoN account
+- If the OAuth email matches an existing account, it's linked
+- Users can have multiple OAuth providers linked to one account
+- MFA can still be enabled alongside OAuth

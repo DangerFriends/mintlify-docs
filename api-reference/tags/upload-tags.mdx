@@ -1,0 +1,102 @@
+---
+title: 'Upload Tags'
+description: 'Get and add tags to uploads'
+---
+
+## Get Upload Tags
+
+Retrieve all tags associated with an upload.
+
+### Request
+
+```bash
+curl https://api.fon.app/api/uploads/550e8400-e29b-41d4-a716-446655440000/tags
+```
+
+### Response
+
+```json
+{
+  "tags": [
+    {
+      "id": "tag-uuid-1",
+      "name": "gadget",
+      "slug": "gadget"
+    },
+    {
+      "id": "tag-uuid-2",
+      "name": "tech",
+      "slug": "tech"
+    }
+  ]
+}
+```
+
+---
+
+## Add Tags to Upload
+
+Add tags to an existing upload.
+
+### Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.fon.app/api/uploads/550e8400-e29b-41d4-a716-446655440000/tags \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"tags": ["new-tag", "another-tag"]}'
+```
+
+```javascript JavaScript
+const response = await fetch(
+  'https://api.fon.app/api/uploads/550e8400-e29b-41d4-a716-446655440000/tags',
+  {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer YOUR_JWT_TOKEN',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      tags: ['new-tag', 'another-tag']
+    })
+  }
+);
+```
+
+</CodeGroup>
+
+### Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `tags` | array | Array of tag names (max 10 total on upload) |
+
+### Response
+
+```json
+{
+  "success": true
+}
+```
+
+## Tag Limits
+
+- Maximum **10 tags** per upload
+- If adding tags would exceed the limit, the request is rejected
+- Tags are automatically normalized (lowercase, trimmed)
+
+## Authorization
+
+- Only the upload owner can add tags
+- Admins can add tags to any upload
+
+## Errors
+
+| Status | Description |
+|--------|-------------|
+| 400 | Too many tags or invalid tag names |
+| 401 | Not authenticated |
+| 403 | Not authorized (not the owner) |
+| 404 | Upload not found |

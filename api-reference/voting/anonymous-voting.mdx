@@ -1,0 +1,104 @@
+---
+title: 'Anonymous Voting'
+openapi: 'POST /api/vote/anonymous'
+---
+
+Vote on content without authentication. Uses browser fingerprinting to prevent vote manipulation.
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.fon.app/api/vote/anonymous \
+  -H "Content-Type: application/json" \
+  -d '{
+    "uploadId": "550e8400-e29b-41d4-a716-446655440000",
+    "vote": "upvote",
+    "clientFingerprint": "abc123def456..."
+  }'
+```
+
+```javascript JavaScript
+// Generate fingerprint (example using fingerprintjs)
+const fp = await FingerprintJS.load();
+const result = await fp.get();
+const fingerprint = result.visitorId;
+
+const response = await fetch('https://api.fon.app/api/vote/anonymous', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    uploadId: '550e8400-e29b-41d4-a716-446655440000',
+    vote: 'upvote',
+    clientFingerprint: fingerprint
+  })
+});
+```
+
+</CodeGroup>
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `uploadId` | UUID | Yes | The upload to vote on |
+| `vote` | string | Yes | `upvote` or `downvote` |
+| `clientFingerprint` | string | Yes | Browser fingerprint hash |
+
+## Response
+
+```json
+{
+  "success": true,
+  "alreadyVoted": false,
+  "vote": "upvote"
+}
+```
+
+If already voted:
+
+```json
+{
+  "success": true,
+  "alreadyVoted": true,
+  "vote": "upvote"
+}
+```
+
+## Fingerprinting
+
+Anonymous voting uses multiple signals to identify unique visitors:
+- Client-provided fingerprint
+- IP address (hashed)
+- User agent
+- Request headers
+
+<Note>
+  IP addresses are hashed and never stored in plain text.
+</Note>
+
+## Vote Mapping
+
+| Anonymous Vote | Equivalent To |
+|----------------|---------------|
+| `upvote` | `fucks` |
+| `downvote` | `does_not_fuck` |
+
+## Rate Limiting
+
+Anonymous votes have stricter rate limits than authenticated votes to prevent abuse.
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Use a fingerprinting library">
+    Libraries like FingerprintJS provide consistent, reliable fingerprints.
+  </Accordion>
+  <Accordion title="Handle 'already voted' gracefully">
+    Check the `alreadyVoted` field to inform users if they've already voted.
+  </Accordion>
+  <Accordion title="Encourage account creation">
+    Authenticated votes are more trusted and less restricted.
+  </Accordion>
+</AccordionGroup>

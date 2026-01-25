@@ -1,0 +1,57 @@
+---
+title: 'Check Status'
+openapi: 'GET /api/auth/check'
+---
+
+Verify if the current session is authenticated and retrieve user information.
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl https://api.fon.app/api/auth/check \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.fon.app/api/auth/check', {
+  headers: {
+    'Authorization': 'Bearer YOUR_JWT_TOKEN'
+  }
+});
+```
+
+</CodeGroup>
+
+## Response
+
+### Authenticated User
+
+```json
+{
+  "authenticated": true,
+  "userId": "550e8400-e29b-41d4-a716-446655440000",
+  "isAdmin": false,
+  "mfaEnabled": true,
+  "user": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "username": "johndoe",
+    "email": "user@example.com"
+  }
+}
+```
+
+### Not Authenticated
+
+```json
+{
+  "authenticated": false
+}
+```
+
+## Use Cases
+
+- Verify token validity on app startup
+- Check if MFA is enabled for the user
+- Determine admin status for UI display

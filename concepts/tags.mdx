@@ -1,0 +1,171 @@
+---
+title: 'Tags'
+description: 'Organizing content with tags'
+---
+
+## Overview
+
+Tags help categorize and discover content on FoN. Users can add tags when uploading or update them later.
+
+## Adding Tags
+
+### During Upload
+
+Include tags as a comma-separated string:
+
+```bash
+curl -X POST https://api.fon.app/api/v1/upload \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -F "upload_type=image" \
+  -F "description=New gadget" \
+  -F "tags=gadget,tech,electronics" \
+  -F "file=@image.jpg"
+```
+
+### After Upload
+
+Add tags to an existing upload:
+
+```bash
+curl -X POST https://api.fon.app/api/uploads/UPLOAD_ID/tags \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"tags": ["new-tag", "another-tag"]}'
+```
+
+## Tag Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `id` | UUID | Unique identifier |
+| `name` | string | Display name |
+| `slug` | string | URL-friendly version |
+| `upload_count` | integer | Number of uploads with this tag |
+
+## Tag Limits
+
+- Maximum **10 tags** per upload
+- Tags are normalized to lowercase
+- Special characters are removed
+
+## Listing Tags
+
+Get all tags with upload counts:
+
+```bash
+curl https://api.fon.app/api/tags?page=1&limit=20 \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+Response:
+
+```json
+{
+  "tags": [
+    {
+      "id": "tag-uuid",
+      "name": "gadget",
+      "slug": "gadget",
+      "upload_count": 150
+    }
+  ],
+  "page": 1,
+  "limit": 20
+}
+```
+
+## Searching Tags
+
+Find tags matching a query:
+
+```bash
+curl "https://api.fon.app/api/tags/search?q=tech&limit=10"
+```
+
+Response:
+
+```json
+{
+  "tags": [
+    {
+      "id": "tag-uuid",
+      "name": "tech",
+      "slug": "tech"
+    },
+    {
+      "id": "tag-uuid-2",
+      "name": "technology",
+      "slug": "technology"
+    }
+  ]
+}
+```
+
+## Filtering by Tags
+
+Get uploads with specific tags:
+
+```bash
+curl "https://api.fon.app/api/uploads/filtered?tags=gadget,tech"
+```
+
+Exclude certain tags:
+
+```bash
+curl "https://api.fon.app/api/uploads/filtered?tags=gadget&excludeTags=nsfw"
+```
+
+## Getting Upload Tags
+
+Retrieve tags for a specific upload:
+
+```bash
+curl https://api.fon.app/api/uploads/UPLOAD_ID/tags
+```
+
+Response:
+
+```json
+{
+  "tags": [
+    {
+      "id": "tag-uuid",
+      "name": "gadget",
+      "slug": "gadget"
+    }
+  ]
+}
+```
+
+## AI-Suggested Tags
+
+FoN can suggest tags for an upload using AI:
+
+```bash
+curl -X POST https://api.fon.app/api/tags/suggest \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"uploadId": "upload-uuid"}'
+```
+
+Response:
+
+```json
+{
+  "suggestedTags": ["electronics", "gadget", "tech"]
+}
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Use descriptive tags">
+    Choose tags that accurately describe the content for better discoverability.
+  </Accordion>
+  <Accordion title="Check existing tags">
+    Search for existing tags before creating new ones to avoid duplicates.
+  </Accordion>
+  <Accordion title="Don't over-tag">
+    Use 3-5 relevant tags rather than maxing out at 10 with irrelevant ones.
+  </Accordion>
+</AccordionGroup>

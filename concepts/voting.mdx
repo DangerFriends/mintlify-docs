@@ -1,0 +1,147 @@
+---
+title: 'Voting'
+description: 'How the FoN voting system works'
+---
+
+## Overview
+
+Voting is central to FoN. Users vote on whether content "fucks" or "does not fuck", and these votes determine what rises to the top.
+
+## Vote Types
+
+### Authenticated Voting
+
+Registered users can cast votes that carry full weight:
+
+```bash
+curl -X POST https://api.fon.app/api/vote \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "uploadId": "upload-uuid",
+    "vote": "fucks"
+  }'
+```
+
+**Vote options:**
+- `fucks` - This content fucks
+- `does_not_fuck` - This content does not fuck
+
+### Anonymous Voting
+
+Unauthenticated users can also vote using browser fingerprinting:
+
+```bash
+curl -X POST https://api.fon.app/api/vote/anonymous \
+  -H "Content-Type: application/json" \
+  -d '{
+    "uploadId": "upload-uuid",
+    "vote": "upvote",
+    "clientFingerprint": "fingerprint-hash"
+  }'
+```
+
+**Anonymous vote options:**
+- `upvote` - Equivalent to "fucks"
+- `downvote` - Equivalent to "does not fuck"
+
+<Note>
+  Anonymous votes use fingerprinting to prevent vote manipulation. Stricter rate limits apply.
+</Note>
+
+## Vote Response
+
+Successful votes return the vote record:
+
+```json
+{
+  "vote": {
+    "id": "vote-uuid",
+    "user_id": "user-uuid",
+    "upload_id": "upload-uuid",
+    "vote": "fucks",
+    "created_at": "2025-01-24T12:00:00Z"
+  }
+}
+```
+
+## Getting Your Votes
+
+Retrieve all votes you've cast:
+
+```bash
+curl https://api.fon.app/api/vote \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+Response:
+
+```json
+{
+  "votes": [
+    {
+      "id": "vote-uuid",
+      "user_id": "user-uuid",
+      "upload_id": "upload-uuid",
+      "vote": "fucks",
+      "created_at": "2025-01-24T12:00:00Z"
+    }
+  ]
+}
+```
+
+## Vote Counts
+
+Each upload tracks vote counts:
+
+| Field | Description |
+|-------|-------------|
+| `upvotes` | Number of "fucks" votes |
+| `downvote_count` | Number of "does not fuck" votes |
+
+These are returned in upload responses:
+
+```json
+{
+  "id": "upload-uuid",
+  "description": "Cool gadget",
+  "upvotes": 42,
+  "downvote_count": 5
+}
+```
+
+## Changing Votes
+
+Users can change their vote by submitting a new vote for the same upload. The previous vote is replaced.
+
+## Rate Limits
+
+Voting is rate limited to prevent abuse:
+
+| Vote Type | Limit | Window |
+|-----------|-------|--------|
+| Authenticated | 20 votes | 1 hour |
+| Anonymous | Stricter | 1 hour |
+
+## Shadow Banning
+
+Admins can shadow ban users. Shadow banned users:
+- Can still vote normally
+- Their votes are recorded
+- **Their votes don't affect counts**
+
+This allows moderation without alerting bad actors.
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Cache vote state locally">
+    Track which uploads the user has voted on to prevent redundant API calls.
+  </Accordion>
+  <Accordion title="Handle rate limits gracefully">
+    When rate limited, inform the user and wait before retrying.
+  </Accordion>
+  <Accordion title="Use authenticated voting when possible">
+    Authenticated votes are more trusted and less strictly rate limited.
+  </Accordion>
+</AccordionGroup>

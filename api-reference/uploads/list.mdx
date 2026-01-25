@@ -1,0 +1,139 @@
+---
+title: 'List Uploads'
+description: 'Browse and filter uploads'
+---
+
+## List All Uploads
+
+Get a paginated list of all public uploads.
+
+### Request
+
+```bash
+curl "https://api.fon.app/api/uploads?page=1&limit=12"
+```
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `page` | integer | 1 | Page number (1-indexed) |
+| `limit` | integer | 12 | Items per page (max 50) |
+
+### Response
+
+```json
+{
+  "uploads": [
+    {
+      "id": "upload-uuid",
+      "user_id": "user-uuid",
+      "filename": "abc123.webp",
+      "description": "Cool gadget",
+      "upload_type": "image",
+      "upvotes": 42,
+      "downvote_count": 5,
+      "created_at": "2025-01-24T12:00:00Z",
+      "tags": [...],
+      "username": "johndoe"
+    }
+  ],
+  "page": 1,
+  "limit": 12
+}
+```
+
+---
+
+## Filter by Tags
+
+Get uploads filtered by tags.
+
+### Request
+
+```bash
+curl "https://api.fon.app/api/uploads/filtered?tags=gadget,tech&page=1"
+```
+
+### Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `tags` | string | Comma-separated tag names to include |
+| `excludeTags` | string | Comma-separated tag names to exclude |
+| `excludeUploadId` | UUID | Upload to exclude from results |
+| `page` | integer | Page number |
+| `limit` | integer | Items per page |
+
+### Example: Related Content
+
+Get uploads with similar tags, excluding the current one:
+
+```bash
+curl "https://api.fon.app/api/uploads/filtered?tags=gadget&excludeUploadId=current-upload-uuid"
+```
+
+---
+
+## Recent Items
+
+Get the 6 most recently uploaded items.
+
+### Request
+
+```bash
+curl https://api.fon.app/api/items-recent
+```
+
+### Response
+
+```json
+{
+  "items": [...],
+  "type": "recent"
+}
+```
+
+<Note>
+  This endpoint is cached for 5 minutes.
+</Note>
+
+---
+
+## Top Voted Items
+
+Get the highest voted items.
+
+### Request
+
+```bash
+curl "https://api.fon.app/api/items-top-voted?limit=10&timeRange=week"
+```
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `limit` | integer | 12 | Number of items |
+| `page` | integer | 1 | Page number |
+| `timeRange` | string | `all` | `day`, `week`, `month`, or `all` |
+
+### Response
+
+```json
+{
+  "uploads": [...],
+  "page": 1,
+  "limit": 10
+}
+```
+
+---
+
+## Caching
+
+| Endpoint | Cache Duration |
+|----------|----------------|
+| `/api/uploads` | 2 minutes |
+| `/api/items-recent` | 5 minutes |
+| `/api/items-top-voted` | 2 minutes |

@@ -1,0 +1,66 @@
+---
+title: 'Search Tags'
+openapi: 'GET /api/tags/search'
+---
+
+Search for tags by name.
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.fon.app/api/tags/search?q=tech&limit=10"
+```
+
+```javascript JavaScript
+const response = await fetch(
+  'https://api.fon.app/api/tags/search?q=tech&limit=10'
+);
+const { tags } = await response.json();
+```
+
+</CodeGroup>
+
+## Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `q` | string | Required | Search query |
+| `limit` | integer | 10 | Max results (max 20) |
+
+## Response
+
+```json
+{
+  "tags": [
+    {
+      "id": "tag-uuid-1",
+      "name": "tech",
+      "slug": "tech"
+    },
+    {
+      "id": "tag-uuid-2",
+      "name": "technology",
+      "slug": "technology"
+    },
+    {
+      "id": "tag-uuid-3",
+      "name": "techno",
+      "slug": "techno"
+    }
+  ]
+}
+```
+
+## Use Cases
+
+- Autocomplete for tag input
+- Tag suggestions while typing
+- Finding existing tags before creating new ones
+
+## Notes
+
+- Search is case-insensitive
+- Matches tags starting with the query
+- No authentication required

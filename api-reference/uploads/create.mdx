@@ -1,0 +1,150 @@
+---
+title: 'Create Upload'
+openapi: 'POST /api/upload'
+---
+
+Upload an image or submit a link for community voting.
+
+## Upload Types
+
+| Type | Description |
+|------|-------------|
+| `image` | Upload an image file |
+| `image_url` | Submit a URL to an image |
+| `link` | Submit a link to external content |
+
+## Image Upload
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.fon.app/api/upload \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -F "upload_type=image" \
+  -F "description=Check out this cool gadget" \
+  -F "tags=gadget,tech" \
+  -F "file=@/path/to/image.jpg"
+```
+
+```javascript JavaScript
+const form = new FormData();
+form.append('upload_type', 'image');
+form.append('description', 'Check out this cool gadget');
+form.append('tags', 'gadget,tech');
+form.append('file', imageFile);
+
+const response = await fetch('https://api.fon.app/api/upload', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_JWT_TOKEN'
+  },
+  body: form
+});
+```
+
+```python Python
+import requests
+
+with open('image.jpg', 'rb') as f:
+    response = requests.post(
+        'https://api.fon.app/api/upload',
+        headers={'Authorization': 'Bearer YOUR_JWT_TOKEN'},
+        files={'file': f},
+        data={
+            'upload_type': 'image',
+            'description': 'Check out this cool gadget',
+            'tags': 'gadget,tech'
+        }
+    )
+```
+
+</CodeGroup>
+
+## Image URL Upload
+
+```bash
+curl -X POST https://api.fon.app/api/upload \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -F "upload_type=image_url" \
+  -F "description=Found this online" \
+  -F "image_url=https://example.com/image.jpg"
+```
+
+## Link Upload
+
+```bash
+curl -X POST https://api.fon.app/api/upload \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -F "upload_type=link" \
+  -F "description=Great video" \
+  -F "external_url=https://youtube.com/watch?v=..."
+```
+
+### Supported Platforms
+
+Links from these platforms get rich embeds:
+- Bluesky
+- Instagram
+- Threads
+- YouTube
+- Tumblr
+- Spotify
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `upload_type` | string | Yes | `image`, `image_url`, or `link` |
+| `description` | string | Yes | Description (max 500 characters) |
+| `file` | file | For image | Image file (JPEG, PNG, GIF, WebP, max 10MB) |
+| `image_url` | string | For image_url | URL to image |
+| `external_url` | string | For link | URL to embed |
+| `tags` | string | No | Comma-separated tags (max 10) |
+| `is_private` | string | No | `"true"` or `"false"` |
+
+## Response
+
+```json
+{
+  "upload": {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "user_id": "user-uuid",
+    "filename": "abc123.webp",
+    "original_name": "myimage.jpg",
+    "description": "Check out this cool gadget",
+    "upload_type": "image",
+    "upvotes": 0,
+    "downvote_count": 0,
+    "is_private": 0,
+    "created_at": "2025-01-24T12:00:00Z"
+  }
+}
+```
+
+## Duplicate Detection
+
+If the image has already been uploaded:
+
+```json
+{
+  "duplicate": true,
+  "existingUploadId": "existing-upload-uuid",
+  "message": "This image has already been uploaded"
+}
+```
+
+## API Token Upload
+
+For programmatic access, use the `/api/v1/upload` endpoint with an API token:
+
+```bash
+curl -X POST https://api.fon.app/api/v1/upload \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -F "upload_type=image" \
+  -F "description=Automated upload" \
+  -F "file=@image.jpg"
+```
+
+## Rate Limiting
+
+Uploads are limited to **20 per hour** per user.

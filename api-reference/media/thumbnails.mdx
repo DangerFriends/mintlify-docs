@@ -1,0 +1,57 @@
+---
+title: 'Get Thumbnail'
+openapi: 'GET /api/thumbnail/{id}'
+---
+
+Retrieve a smaller thumbnail version of an image.
+
+## Request
+
+```bash
+curl https://api.fon.app/api/thumbnail/550e8400-e29b-41d4-a716-446655440000
+```
+
+## Response
+
+Returns a smaller, optimized version of the image.
+
+| Header | Value | Description |
+|--------|-------|-------------|
+| `Content-Type` | `image/webp` or `image/jpeg` | Image format |
+| `Cache-Control` | `public, max-age=31536000` | 1 year cache |
+
+## Thumbnail vs Full Image
+
+| Attribute | Thumbnail | Full Image |
+|-----------|-----------|------------|
+| Size | Smaller dimensions | Original dimensions |
+| Quality | Optimized for preview | Full quality |
+| Format | WebP or JPEG | Original format |
+| Use Case | Listings, previews | Detail view |
+
+## Use Cases
+
+- Gallery thumbnails
+- List views
+- Card previews
+- Low-bandwidth scenarios
+
+## HTML Usage
+
+```html
+<!-- Thumbnail in listing -->
+<img src="https://api.fon.app/api/thumbnail/upload-uuid"
+     alt="Preview"
+     loading="lazy" />
+
+<!-- Link to full image -->
+<a href="https://api.fon.app/api/image/upload-uuid">
+  <img src="https://api.fon.app/api/thumbnail/upload-uuid" alt="Preview" />
+</a>
+```
+
+## Access Control
+
+Same as full images:
+- **Public uploads**: Thumbnails accessible to everyone
+- **Private uploads**: Thumbnails only accessible to owner and admins

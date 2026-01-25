@@ -1,0 +1,70 @@
+---
+title: 'List Tags'
+openapi: 'GET /api/tags'
+---
+
+Get all tags with upload counts.
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.fon.app/api/tags?page=1&limit=20" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.fon.app/api/tags?page=1&limit=20', {
+  headers: {
+    'Authorization': 'Bearer YOUR_JWT_TOKEN'
+  }
+});
+```
+
+</CodeGroup>
+
+## Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `page` | integer | 1 | Page number |
+| `limit` | integer | 20 | Items per page |
+
+## Response
+
+```json
+{
+  "tags": [
+    {
+      "id": "tag-uuid-1",
+      "name": "gadget",
+      "slug": "gadget",
+      "upload_count": 150
+    },
+    {
+      "id": "tag-uuid-2",
+      "name": "tech",
+      "slug": "tech",
+      "upload_count": 120
+    }
+  ],
+  "page": 1,
+  "limit": 20
+}
+```
+
+## Tag Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | UUID | Tag identifier |
+| `name` | string | Display name |
+| `slug` | string | URL-friendly version |
+| `upload_count` | integer | Number of uploads with this tag |
+
+## Use Cases
+
+- Display tag cloud
+- Show popular tags
+- Build tag navigation

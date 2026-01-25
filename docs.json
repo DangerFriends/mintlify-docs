@@ -1,11 +1,11 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "FoN API Documentation",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#8B5CF6",
+    "light": "#A78BFA",
+    "dark": "#7C3AED"
   },
   "favicon": "/favicon.svg",
   "navigation": {
@@ -14,55 +14,91 @@
         "tab": "Guides",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Getting Started",
             "pages": [
               "index",
               "quickstart",
-              "development"
+              "authentication"
             ]
           },
           {
-            "group": "Customization",
+            "group": "Core Concepts",
             "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "concepts/uploads",
+              "concepts/voting",
+              "concepts/tags"
             ]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "API Reference",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "Overview",
             "pages": [
               "api-reference/introduction"
             ]
           },
           {
-            "group": "Endpoint examples",
+            "group": "Authentication",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "api-reference/auth/register-login",
+              "api-reference/auth/check-status",
+              "api-reference/auth/logout",
+              "api-reference/auth/password-management",
+              "api-reference/auth/mfa",
+              "api-reference/auth/api-tokens",
+              "api-reference/auth/oauth"
+            ]
+          },
+          {
+            "group": "Uploads",
+            "pages": [
+              "api-reference/uploads/create",
+              "api-reference/uploads/get",
+              "api-reference/uploads/list",
+              "api-reference/uploads/delete",
+              "api-reference/uploads/privacy"
+            ]
+          },
+          {
+            "group": "Voting",
+            "pages": [
+              "api-reference/voting/submit-vote",
+              "api-reference/voting/get-votes",
+              "api-reference/voting/anonymous-voting"
+            ]
+          },
+          {
+            "group": "Tags",
+            "pages": [
+              "api-reference/tags/list",
+              "api-reference/tags/search",
+              "api-reference/tags/upload-tags"
+            ]
+          },
+          {
+            "group": "Media",
+            "pages": [
+              "api-reference/media/images",
+              "api-reference/media/thumbnails"
+            ]
+          },
+          {
+            "group": "User",
+            "pages": [
+              "api-reference/user/profile",
+              "api-reference/user/uploads"
+            ]
+          },
+          {
+            "group": "Admin",
+            "pages": [
+              "api-reference/admin/overview",
+              "api-reference/admin/users",
+              "api-reference/admin/uploads",
+              "api-reference/admin/moderation"
             ]
           }
         ]
@@ -71,14 +107,9 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "anchor": "API Status",
+          "href": "https://status.fon.app",
+          "icon": "signal"
         }
       ]
     }
@@ -91,32 +122,25 @@
     "links": [
       {
         "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "href": "mailto:support@fon.app"
       }
     ],
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "href": "https://fon.app/dashboard"
     }
   },
-  "contextual": {
-    "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
+  "api": {
+    "baseUrl": "https://api.fon.app",
+    "auth": {
+      "method": "bearer"
+    }
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://x.com/fonapp",
+      "github": "https://github.com/fon"
     }
   }
 }

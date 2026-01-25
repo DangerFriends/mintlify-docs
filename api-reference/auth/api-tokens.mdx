@@ -1,0 +1,119 @@
+---
+title: 'API Tokens'
+description: 'Generate and manage API tokens for programmatic access'
+---
+
+API tokens provide long-lived authentication for scripts and integrations.
+
+## Generate Token
+
+Create a new API token.
+
+### Request
+
+```bash
+curl -X POST https://api.fon.app/api/auth/tokens/generate \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Upload Script"}'
+```
+
+### Response
+
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "token": "fon_live_abc123def456ghi789...",
+  "name": "Upload Script",
+  "expiresAt": "2026-01-24T00:00:00Z"
+}
+```
+
+<Warning>
+  The `token` value is only shown once. Store it securely as it cannot be retrieved later.
+</Warning>
+
+---
+
+## List Tokens
+
+Get all API tokens for your account.
+
+### Request
+
+```bash
+curl https://api.fon.app/api/auth/tokens \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+### Response
+
+```json
+{
+  "tokens": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440000",
+      "name": "Upload Script",
+      "createdAt": "2025-01-24T00:00:00Z",
+      "lastUsedAt": "2025-01-24T12:00:00Z",
+      "expiresAt": "2026-01-24T00:00:00Z"
+    }
+  ]
+}
+```
+
+<Note>
+  The token value is not included in the list response for security.
+</Note>
+
+---
+
+## Revoke Token
+
+Delete a token to revoke its access.
+
+### Request
+
+```bash
+curl -X DELETE https://api.fon.app/api/auth/tokens/TOKEN_ID \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+### Response
+
+```json
+{
+  "success": true
+}
+```
+
+---
+
+## Using API Tokens
+
+Use API tokens with the `/api/v1/upload` endpoint:
+
+```bash
+curl -X POST https://api.fon.app/api/v1/upload \
+  -H "Authorization: Bearer fon_live_abc123def456..." \
+  -F "upload_type=image" \
+  -F "description=My upload" \
+  -F "file=@image.jpg"
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Use descriptive names">
+    Name tokens based on their purpose (e.g., "GitHub Action", "Backup Script")
+  </Accordion>
+  <Accordion title="Rotate regularly">
+    Generate new tokens periodically and revoke old ones
+  </Accordion>
+  <Accordion title="One token per use case">
+    Create separate tokens for different integrations so you can revoke individually
+  </Accordion>
+  <Accordion title="Never commit tokens">
+    Use environment variables or secret management tools
+  </Accordion>
+</AccordionGroup>

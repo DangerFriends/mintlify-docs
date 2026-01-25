@@ -1,58 +1,917 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
-    },
-    "version": "1.0.0"
+    "title": "FoN API",
+    "description": "API for the FoN (Fucks or Not) community voting platform. Upload images and links, vote on content, and discover what fucks.",
+    "version": "1.0.0",
+    "contact": {
+      "email": "support@fon.app"
+    }
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://api.fon.app",
+      "description": "Production server"
     }
   ],
   "security": [
     {
       "bearerAuth": []
+    },
+    {
+      "cookieAuth": []
     }
   ],
+  "tags": [
+    { "name": "Authentication", "description": "User authentication and session management" },
+    { "name": "MFA", "description": "Multi-factor authentication setup and verification" },
+    { "name": "API Tokens", "description": "API token generation and management" },
+    { "name": "Uploads", "description": "Content upload and management" },
+    { "name": "Voting", "description": "Vote on uploads" },
+    { "name": "Tags", "description": "Content categorization and discovery" },
+    { "name": "Media", "description": "Image and thumbnail retrieval" },
+    { "name": "User", "description": "User profile and content" },
+    { "name": "Admin", "description": "Administrative operations" }
+  ],
   "paths": {
-    "/plants": {
+    "/api/auth": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Register or Login",
+        "description": "Create a new account or authenticate an existing user",
+        "operationId": "authRegisterLogin",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  { "$ref": "#/components/schemas/RegisterRequest" },
+                  { "$ref": "#/components/schemas/LoginRequest" }
+                ]
+              },
+              "examples": {
+                "register": {
+                  "summary": "Register new user",
+                  "value": {
+                    "action": "register",
+                    "email": "user@example.com",
+                    "username": "johndoe",
+                    "password": "SecurePassword123!"
+                  }
+                },
+                "login": {
+                  "summary": "Login existing user",
+                  "value": {
+                    "action": "login",
+                    "email": "user@example.com",
+                    "password": "SecurePassword123!",
+                    "mfaCode": "123456"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful authentication",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/check": {
       "get": {
-        "description": "Returns all plants from the system that the user has access to",
+        "tags": ["Authentication"],
+        "summary": "Check Authentication Status",
+        "description": "Verify if the current session is authenticated and get user info",
+        "operationId": "authCheck",
+        "responses": {
+          "200": {
+            "description": "Authentication status",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthCheckResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Logout",
+        "description": "End the current session and revoke the JWT token",
+        "operationId": "authLogout",
+        "responses": {
+          "200": {
+            "description": "Successfully logged out",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/forgot-password": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Request Password Reset",
+        "description": "Send a password reset email to the specified address",
+        "operationId": "forgotPassword",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reset email sent (if account exists)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/reset-password": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Reset Password",
+        "description": "Set a new password using a reset token",
+        "operationId": "resetPassword",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ResetPasswordRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password successfully reset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/change-password": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Change Password",
+        "description": "Change the password for the authenticated user",
+        "operationId": "changePassword",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ChangePasswordRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password successfully changed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "requireRelogin": { "type": "boolean" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/mfa/setup": {
+      "post": {
+        "tags": ["MFA"],
+        "summary": "Setup MFA",
+        "description": "Initialize multi-factor authentication for the account",
+        "operationId": "mfaSetup",
+        "responses": {
+          "200": {
+            "description": "MFA setup data",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/MFASetupResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/mfa/verify": {
+      "post": {
+        "tags": ["MFA"],
+        "summary": "Verify MFA Setup",
+        "description": "Complete MFA setup by verifying a TOTP code",
+        "operationId": "mfaVerify",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["mfaCode"],
+                "properties": {
+                  "mfaCode": { "type": "string", "pattern": "^[0-9]{6}$" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "MFA successfully enabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/mfa/disable": {
+      "post": {
+        "tags": ["MFA"],
+        "summary": "Disable MFA",
+        "description": "Disable multi-factor authentication (requires current MFA code)",
+        "operationId": "mfaDisable",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["mfaCode"],
+                "properties": {
+                  "mfaCode": { "type": "string", "pattern": "^[0-9]{6}$" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "MFA successfully disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/tokens": {
+      "get": {
+        "tags": ["API Tokens"],
+        "summary": "List API Tokens",
+        "description": "Get all API tokens for the authenticated user",
+        "operationId": "listApiTokens",
+        "responses": {
+          "200": {
+            "description": "List of API tokens",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tokens": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/ApiToken" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/tokens/generate": {
+      "post": {
+        "tags": ["API Tokens"],
+        "summary": "Generate API Token",
+        "description": "Create a new API token for programmatic access",
+        "operationId": "generateApiToken",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name"],
+                "properties": {
+                  "name": { "type": "string", "maxLength": 100 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Newly created API token",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiTokenCreated" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/tokens/{id}": {
+      "delete": {
+        "tags": ["API Tokens"],
+        "summary": "Revoke API Token",
+        "description": "Delete an API token to revoke access",
+        "operationId": "revokeApiToken",
         "parameters": [
           {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
           }
         ],
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "Token successfully revoked",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/upload": {
+      "post": {
+        "tags": ["Uploads"],
+        "summary": "Create Upload",
+        "description": "Upload an image or submit a link for community voting",
+        "operationId": "createUpload",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": { "$ref": "#/components/schemas/UploadRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Upload created successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UploadResponse" }
+              }
+            }
+          },
+          "200 ": {
+            "description": "Duplicate detected",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/DuplicateResponse" }
+              }
+            }
+          },
+          "413": {
+            "description": "File too large (max 10MB)"
+          }
+        }
+      }
+    },
+    "/api/v1/upload": {
+      "post": {
+        "tags": ["Uploads"],
+        "summary": "Create Upload (API Token)",
+        "description": "Upload content using an API token instead of session cookie",
+        "operationId": "createUploadApiToken",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": { "$ref": "#/components/schemas/UploadRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Upload created successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UploadResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/upload/{id}": {
+      "get": {
+        "tags": ["Uploads"],
+        "summary": "Get Upload",
+        "description": "Retrieve details for a specific upload",
+        "operationId": "getUpload",
+        "security": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Upload details",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Upload" }
+              }
+            }
+          },
+          "404": {
+            "description": "Upload not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Uploads"],
+        "summary": "Delete Upload",
+        "description": "Delete an upload (owner only)",
+        "operationId": "deleteUpload",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Upload deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" }
                   }
                 }
               }
             }
           },
-          "400": {
-            "description": "Unexpected error",
+          "403": {
+            "description": "Not authorized to delete this upload"
+          }
+        }
+      }
+    },
+    "/api/upload/{id}/privacy": {
+      "patch": {
+        "tags": ["Uploads"],
+        "summary": "Update Privacy",
+        "description": "Change the privacy setting of an upload",
+        "operationId": "updateUploadPrivacy",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["is_private"],
+                "properties": {
+                  "is_private": { "type": "boolean" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Privacy updated"
+          }
+        }
+      }
+    },
+    "/api/uploads": {
+      "get": {
+        "tags": ["Uploads"],
+        "summary": "List Uploads",
+        "description": "Get paginated list of all public uploads",
+        "operationId": "listUploads",
+        "security": [],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 12, "maximum": 50 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated uploads",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UploadListResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/uploads/filtered": {
+      "get": {
+        "tags": ["Uploads"],
+        "summary": "Filter Uploads by Tags",
+        "description": "Get uploads filtered by included/excluded tags",
+        "operationId": "filterUploads",
+        "security": [],
+        "parameters": [
+          {
+            "name": "tags",
+            "in": "query",
+            "description": "Comma-separated tag names to include",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "excludeTags",
+            "in": "query",
+            "description": "Comma-separated tag names to exclude",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "excludeUploadId",
+            "in": "query",
+            "description": "Upload ID to exclude from results",
+            "schema": { "type": "string", "format": "uuid" }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 12 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Filtered uploads",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UploadListResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/items-recent": {
+      "get": {
+        "tags": ["Uploads"],
+        "summary": "Recent Items",
+        "description": "Get the 6 most recently uploaded items",
+        "operationId": "recentItems",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Recent items",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Upload" }
+                    },
+                    "type": { "type": "string", "example": "recent" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/items-top-voted": {
+      "get": {
+        "tags": ["Uploads"],
+        "summary": "Top Voted Items",
+        "description": "Get the highest voted items",
+        "operationId": "topVotedItems",
+        "security": [],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 12 }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 }
+          },
+          {
+            "name": "timeRange",
+            "in": "query",
+            "description": "Filter by time range",
+            "schema": { "type": "string", "enum": ["day", "week", "month", "all"] }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Top voted items",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UploadListResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vote": {
+      "post": {
+        "tags": ["Voting"],
+        "summary": "Submit Vote",
+        "description": "Vote on an upload (authenticated users)",
+        "operationId": "submitVote",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/VoteRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Vote recorded",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/VoteResponse" }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded (20 votes per hour)"
+          }
+        }
+      },
+      "get": {
+        "tags": ["Voting"],
+        "summary": "Get User Votes",
+        "description": "Get all votes cast by the authenticated user",
+        "operationId": "getUserVotes",
+        "responses": {
+          "200": {
+            "description": "User's votes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "votes": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Vote" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/vote/anonymous": {
+      "post": {
+        "tags": ["Voting"],
+        "summary": "Anonymous Vote",
+        "description": "Vote on an upload without authentication (uses fingerprinting)",
+        "operationId": "anonymousVote",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AnonymousVoteRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Vote recorded",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnonymousVoteResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tags": {
+      "get": {
+        "tags": ["Tags"],
+        "summary": "List Tags",
+        "description": "Get all tags with upload counts",
+        "operationId": "listTags",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 20 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of tags",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TagListResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tags/search": {
+      "get": {
+        "tags": ["Tags"],
+        "summary": "Search Tags",
+        "description": "Search for tags by name",
+        "operationId": "searchTags",
+        "security": [],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 10, "maximum": 20 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matching tags",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tags": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Tag" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/uploads/{id}/tags": {
+      "get": {
+        "tags": ["Tags"],
+        "summary": "Get Upload Tags",
+        "description": "Get all tags associated with an upload",
+        "operationId": "getUploadTags",
+        "security": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Upload tags",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tags": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Tag" }
+                    }
+                  }
                 }
               }
             }
@@ -60,35 +919,166 @@
         }
       },
       "post": {
-        "description": "Creates a new plant in the store",
+        "tags": ["Tags"],
+        "summary": "Add Tags to Upload",
+        "description": "Add tags to an upload",
+        "operationId": "addUploadTags",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
         "requestBody": {
-          "description": "Plant to add to the store",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Plant"
+                "type": "object",
+                "required": ["tags"],
+                "properties": {
+                  "tags": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "maxItems": 10
+                  }
                 }
               }
             }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tags added successfully"
+          }
+        }
+      }
+    },
+    "/api/image/{id}": {
+      "get": {
+        "tags": ["Media"],
+        "summary": "Get Image",
+        "description": "Retrieve the full image for an upload",
+        "operationId": "getImage",
+        "security": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Image binary data",
+            "headers": {
+              "Cache-Control": {
+                "schema": { "type": "string" },
+                "description": "public, max-age=31536000 (1 year for public images)"
+              },
+              "ETag": {
+                "schema": { "type": "string" },
+                "description": "Content hash for caching"
+              }
+            },
+            "content": {
+              "image/webp": {},
+              "image/jpeg": {},
+              "image/png": {},
+              "image/gif": {}
+            }
           },
-          "400": {
-            "description": "unexpected error",
+          "404": {
+            "description": "Image not found or access denied"
+          }
+        }
+      }
+    },
+    "/api/thumbnail/{id}": {
+      "get": {
+        "tags": ["Media"],
+        "summary": "Get Thumbnail",
+        "description": "Retrieve a smaller thumbnail version of an image",
+        "operationId": "getThumbnail",
+        "security": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thumbnail image",
+            "content": {
+              "image/webp": {},
+              "image/jpeg": {}
+            }
+          }
+        }
+      }
+    },
+    "/api/profile": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Get Profile",
+        "description": "Get the authenticated user's profile data",
+        "operationId": "getProfile",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Data to retrieve",
+            "schema": { "type": "string", "enum": ["uploads", "votes", "counts"] }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Profile data",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProfileResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/{username}/uploads": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Get User Uploads",
+        "description": "Get public uploads from a specific user",
+        "operationId": "getUserUploads",
+        "security": [],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User's uploads",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "type": "object",
+                  "properties": {
+                    "uploads": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Upload" }
+                    },
+                    "username": { "type": "string" },
+                    "uploadCount": { "type": "integer" }
+                  }
                 }
               }
             }
@@ -96,57 +1086,96 @@
         }
       }
     },
-    "/plants/{id}": {
+    "/api/admin/users": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "List Users",
+        "description": "Get paginated list of all users (admin only)",
+        "operationId": "adminListUsers",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 20 }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User list",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AdminUserListResponse" }
+              }
+            }
+          },
+          "403": {
+            "description": "Admin access required"
+          }
+        }
+      }
+    },
+    "/api/admin/users/{id}": {
       "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
+        "tags": ["Admin"],
+        "summary": "Delete User",
+        "description": "Delete a user account (admin only)",
+        "operationId": "adminDeleteUser",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "ID of plant to delete",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
+            "schema": { "type": "string", "format": "uuid" }
           }
         ],
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+          "200": {
+            "description": "User deleted"
           }
         }
       }
-    }
-  },
-  "webhooks": {
-    "/plant/webhook": {
+    },
+    "/api/admin/users/{id}/shadow-ban": {
       "post": {
-        "description": "Information about a new plant added to the store",
+        "tags": ["Admin"],
+        "summary": "Shadow Ban User",
+        "description": "Shadow ban a user (their votes no longer count)",
+        "operationId": "adminShadowBan",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
         "requestBody": {
-          "description": "Plant added to the store",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+                "type": "object",
+                "required": ["isBanned"],
+                "properties": {
+                  "isBanned": { "type": "boolean" }
+                }
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Return a 200 status to indicate that the data was received successfully"
+            "description": "Ban status updated"
           }
         }
       }
@@ -154,63 +1183,279 @@
   },
   "components": {
     "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
+      "RegisterRequest": {
         "type": "object",
+        "required": ["action", "email", "username", "password"],
         "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
-          },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
-          }
+          "action": { "type": "string", "enum": ["register"] },
+          "email": { "type": "string", "format": "email" },
+          "username": { "type": "string", "minLength": 3, "maxLength": 30, "pattern": "^[a-zA-Z0-9_]+$" },
+          "password": { "type": "string", "minLength": 8 }
         }
       },
-      "NewPlant": {
+      "LoginRequest": {
+        "type": "object",
+        "required": ["action", "email", "password"],
+        "properties": {
+          "action": { "type": "string", "enum": ["login"] },
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string" },
+          "mfaCode": { "type": "string", "pattern": "^[0-9]{6}$", "description": "Required if MFA is enabled" }
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "user": { "$ref": "#/components/schemas/User" },
+          "token": { "type": "string", "description": "JWT token" },
+          "mfaRequired": { "type": "boolean" }
+        }
+      },
+      "AuthCheckResponse": {
+        "type": "object",
+        "properties": {
+          "authenticated": { "type": "boolean" },
+          "userId": { "type": "string", "format": "uuid" },
+          "isAdmin": { "type": "boolean" },
+          "mfaEnabled": { "type": "boolean" },
+          "user": { "$ref": "#/components/schemas/User" }
+        }
+      },
+      "ResetPasswordRequest": {
+        "type": "object",
+        "required": ["token", "newPassword", "confirmPassword"],
+        "properties": {
+          "token": { "type": "string" },
+          "newPassword": { "type": "string", "minLength": 8 },
+          "confirmPassword": { "type": "string" }
+        }
+      },
+      "ChangePasswordRequest": {
+        "type": "object",
+        "required": ["currentPassword", "newPassword", "confirmPassword"],
+        "properties": {
+          "currentPassword": { "type": "string" },
+          "newPassword": { "type": "string", "minLength": 8 },
+          "confirmPassword": { "type": "string" },
+          "mfaCode": { "type": "string", "pattern": "^[0-9]{6}$", "description": "Required if MFA is enabled" }
+        }
+      },
+      "MFASetupResponse": {
+        "type": "object",
+        "properties": {
+          "qrCode": { "type": "string", "description": "Base64 encoded QR code image" },
+          "secret": { "type": "string", "description": "TOTP secret for manual entry" },
+          "backupCodes": { "type": "array", "items": { "type": "string" }, "description": "One-time backup codes" }
+        }
+      },
+      "ApiToken": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "name": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "lastUsedAt": { "type": "string", "format": "date-time", "nullable": true },
+          "expiresAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "ApiTokenCreated": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "token": { "type": "string", "description": "The token value (only shown once)" },
+          "name": { "type": "string" },
+          "expiresAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "username": { "type": "string" },
+          "email": { "type": "string", "format": "email" }
+        }
+      },
+      "Upload": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "user_id": { "type": "string", "format": "uuid" },
+          "filename": { "type": "string", "nullable": true },
+          "original_name": { "type": "string", "nullable": true },
+          "description": { "type": "string" },
+          "upload_type": { "type": "string", "enum": ["image", "link"] },
+          "external_url": { "type": "string", "nullable": true },
+          "upvotes": { "type": "integer" },
+          "downvote_count": { "type": "integer" },
+          "is_private": { "type": "integer", "enum": [0, 1] },
+          "created_at": { "type": "string", "format": "date-time" },
+          "tags": { "type": "array", "items": { "$ref": "#/components/schemas/Tag" } },
+          "username": { "type": "string" }
+        }
+      },
+      "UploadRequest": {
+        "type": "object",
+        "required": ["upload_type", "description"],
+        "properties": {
+          "upload_type": { "type": "string", "enum": ["image", "image_url", "link"] },
+          "description": { "type": "string", "maxLength": 500 },
+          "tags": { "type": "string", "description": "Comma-separated tag names (max 10)" },
+          "file": { "type": "string", "format": "binary", "description": "Image file (JPEG, PNG, GIF, WebP, max 10MB)" },
+          "image_url": { "type": "string", "format": "uri", "description": "URL to image (for image_url type)" },
+          "external_url": { "type": "string", "format": "uri", "description": "URL to embed (for link type)" },
+          "is_private": { "type": "string", "enum": ["true", "false"] }
+        }
+      },
+      "UploadResponse": {
+        "type": "object",
+        "properties": {
+          "upload": { "$ref": "#/components/schemas/Upload" },
+          "embedData": { "type": "object", "description": "Embed data for links" }
+        }
+      },
+      "DuplicateResponse": {
+        "type": "object",
+        "properties": {
+          "duplicate": { "type": "boolean", "example": true },
+          "existingUploadId": { "type": "string", "format": "uuid" },
+          "message": { "type": "string" }
+        }
+      },
+      "UploadListResponse": {
+        "type": "object",
+        "properties": {
+          "uploads": { "type": "array", "items": { "$ref": "#/components/schemas/Upload" } },
+          "page": { "type": "integer" },
+          "limit": { "type": "integer" }
+        }
+      },
+      "VoteRequest": {
+        "type": "object",
+        "required": ["uploadId", "vote"],
+        "properties": {
+          "uploadId": { "type": "string", "format": "uuid" },
+          "vote": { "type": "string", "enum": ["fucks", "does_not_fuck"] }
+        }
+      },
+      "VoteResponse": {
+        "type": "object",
+        "properties": {
+          "vote": { "$ref": "#/components/schemas/Vote" }
+        }
+      },
+      "Vote": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "user_id": { "type": "string", "format": "uuid" },
+          "upload_id": { "type": "string", "format": "uuid" },
+          "vote": { "type": "string", "enum": ["fucks", "does_not_fuck"] },
+          "created_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "AnonymousVoteRequest": {
+        "type": "object",
+        "required": ["uploadId", "vote", "clientFingerprint"],
+        "properties": {
+          "uploadId": { "type": "string", "format": "uuid" },
+          "vote": { "type": "string", "enum": ["upvote", "downvote"] },
+          "clientFingerprint": { "type": "string", "description": "Browser fingerprint hash" }
+        }
+      },
+      "AnonymousVoteResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "alreadyVoted": { "type": "boolean" },
+          "vote": { "type": "string" }
+        }
+      },
+      "Tag": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "name": { "type": "string" },
+          "slug": { "type": "string" }
+        }
+      },
+      "TagWithCount": {
         "allOf": [
+          { "$ref": "#/components/schemas/Tag" },
           {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
             "type": "object",
             "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
+              "upload_count": { "type": "integer" }
             }
           }
         ]
       },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
+      "TagListResponse": {
         "type": "object",
         "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "message": {
-            "type": "string"
+          "tags": { "type": "array", "items": { "$ref": "#/components/schemas/TagWithCount" } },
+          "page": { "type": "integer" },
+          "limit": { "type": "integer" }
+        }
+      },
+      "ProfileResponse": {
+        "type": "object",
+        "properties": {
+          "uploads": { "type": "array", "items": { "$ref": "#/components/schemas/Upload" } },
+          "votes": { "type": "array", "items": { "$ref": "#/components/schemas/Vote" } },
+          "counts": {
+            "type": "object",
+            "properties": {
+              "uploads": { "type": "integer" },
+              "votes": { "type": "integer" }
+            }
           }
+        }
+      },
+      "AdminUserListResponse": {
+        "type": "object",
+        "properties": {
+          "users": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "string", "format": "uuid" },
+                "username": { "type": "string" },
+                "email": { "type": "string" },
+                "is_admin": { "type": "boolean" },
+                "is_shadow_banned": { "type": "boolean" },
+                "has_eleven_access": { "type": "boolean" },
+                "created_at": { "type": "string", "format": "date-time" },
+                "upload_count": { "type": "integer" },
+                "vote_count": { "type": "integer" }
+              }
+            }
+          },
+          "page": { "type": "integer" },
+          "limit": { "type": "integer" },
+          "total": { "type": "integer" }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": { "type": "string" },
+          "message": { "type": "string" }
         }
       }
     },
     "securitySchemes": {
       "bearerAuth": {
         "type": "http",
-        "scheme": "bearer"
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT token or API token"
+      },
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "auth-token",
+        "description": "Session cookie"
       }
     }
   }

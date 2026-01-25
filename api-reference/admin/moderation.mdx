@@ -1,0 +1,135 @@
+---
+title: 'Moderation'
+description: 'Admin endpoints for content moderation'
+---
+
+## Shadow Ban User
+
+Shadow ban a user. Their votes are recorded but don't affect counts.
+
+### Request
+
+```bash
+curl -X POST https://api.fon.app/api/admin/users/USER_ID/shadow-ban \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"isBanned": true}'
+```
+
+### Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `isBanned` | boolean | `true` to ban, `false` to unban |
+
+### Response
+
+```json
+{
+  "success": true
+}
+```
+
+### How Shadow Banning Works
+
+- User can still vote normally
+- User doesn't know they're banned
+- Their votes are stored but don't affect upload vote counts
+- Useful for dealing with vote manipulation without alerting bad actors
+
+---
+
+## View Anonymous Votes
+
+Get anonymous voting data for analysis.
+
+### Request
+
+```bash
+curl "https://api.fon.app/api/admin/anonymous-votes?limit=50&days=7&stats=true" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `limit` | integer | 50 | Votes to return |
+| `offset` | integer | 0 | Pagination offset |
+| `days` | integer | 30 | Days to look back |
+| `stats` | boolean | false | Include statistics |
+
+### Response with Stats
+
+```json
+{
+  "votes": [...],
+  "stats": {
+    "total_votes": 1000,
+    "unique_fingerprints": 500,
+    "votes_today": 45,
+    "votes_last_7_days": 300,
+    "votes_last_30_days": 800,
+    "top_voted_uploads": [...]
+  },
+  "pagination": {
+    "limit": 50,
+    "offset": 0
+  }
+}
+```
+
+---
+
+## Issue Reports
+
+### List Reports
+
+```bash
+curl "https://api.fon.app/api/admin/issue-reports?page=1&status=open" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+### Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `page` | integer | Page number |
+| `limit` | integer | Items per page |
+| `status` | string | Filter by status: `open`, `resolved`, `dismissed` |
+
+### Update Report Status
+
+```bash
+curl -X PATCH https://api.fon.app/api/admin/issue-reports/REPORT_ID/status \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"status": "resolved"}'
+```
+
+### Status Values
+
+| Status | Description |
+|--------|-------------|
+| `open` | New, needs review |
+| `resolved` | Action taken |
+| `dismissed` | No action needed |
+
+---
+
+## Moderation Best Practices
+
+<AccordionGroup>
+  <Accordion title="Use shadow banning for vote manipulation">
+    Don't delete accounts outright - shadow ban first to observe behavior.
+  </Accordion>
+  <Accordion title="Review anonymous vote patterns">
+    Check for unusual patterns that might indicate manipulation.
+  </Accordion>
+  <Accordion title="Handle reports promptly">
+    Users trust that reported content will be reviewed.
+  </Accordion>
+  <Accordion title="Document actions">
+    Keep notes on why moderation actions were taken.
+  </Accordion>
+</AccordionGroup>

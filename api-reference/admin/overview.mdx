@@ -1,0 +1,96 @@
+---
+title: 'Admin Overview'
+description: 'Administrative API endpoints'
+---
+
+## Overview
+
+Admin endpoints provide access to moderation and management features. All admin endpoints require:
+
+1. **Authentication** - Valid JWT or session
+2. **Admin role** - The authenticated user must have admin privileges
+3. **MFA** (for sensitive operations) - Some operations require MFA verification
+
+## Admin Endpoints
+
+<CardGroup cols={2}>
+  <Card title="Users" icon="users" href="/api-reference/admin/users">
+    List, manage, and moderate users
+  </Card>
+  <Card title="Uploads" icon="images" href="/api-reference/admin/uploads">
+    Manage and moderate content
+  </Card>
+  <Card title="Moderation" icon="shield" href="/api-reference/admin/moderation">
+    Shadow bans, issue reports, and tags
+  </Card>
+</CardGroup>
+
+## Becoming an Admin
+
+### Initial Admin Setup
+
+The first admin is set using a secret key:
+
+```bash
+curl -X POST https://api.fon.app/api/admin/set-initial-admin \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@example.com",
+    "secretKey": "YOUR_ADMIN_SETUP_KEY"
+  }'
+```
+
+<Warning>
+  The `ADMIN_SETUP_KEY` must be set in the server environment. This endpoint is disabled after the first admin is created.
+</Warning>
+
+### Granting Admin to Others
+
+Existing admins can grant admin privileges:
+
+```bash
+curl -X POST https://api.fon.app/api/admin/users/USER_ID/admin \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"isAdmin": true}'
+```
+
+## Check Admin Status
+
+Verify if the current user is an admin:
+
+```bash
+curl https://api.fon.app/api/admin/check \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+Response:
+
+```json
+{
+  "isAdmin": true
+}
+```
+
+## Error Handling
+
+Admin endpoints return specific errors:
+
+| Status | Description |
+|--------|-------------|
+| 401 | Not authenticated |
+| 403 | Not an admin or MFA required |
+| 404 | Resource not found |
+
+## Rate Limiting
+
+Admin endpoints have standard rate limits but are not additionally restricted for trusted admin users.
+
+## Audit Logging
+
+Admin actions are logged for security auditing. All moderation actions include:
+- Admin user ID
+- Action type
+- Target resource
+- Timestamp
+- IP address

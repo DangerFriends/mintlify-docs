@@ -1,0 +1,54 @@
+---
+title: 'Delete Upload'
+openapi: 'DELETE /api/upload/{id}'
+---
+
+Delete an upload. Only the owner can delete their uploads.
+
+## Request
+
+<CodeGroup>
+
+```bash cURL
+curl -X DELETE https://api.fon.app/api/upload/550e8400-e29b-41d4-a716-446655440000 \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+```javascript JavaScript
+const response = await fetch(
+  'https://api.fon.app/api/upload/550e8400-e29b-41d4-a716-446655440000',
+  {
+    method: 'DELETE',
+    headers: {
+      'Authorization': 'Bearer YOUR_JWT_TOKEN'
+    }
+  }
+);
+```
+
+</CodeGroup>
+
+## Response
+
+```json
+{
+  "success": true
+}
+```
+
+## Authorization
+
+- Users can only delete their own uploads
+- Admins can delete any upload via `/api/admin/uploads/{id}`
+
+## Errors
+
+| Status | Description |
+|--------|-------------|
+| 401 | Not authenticated |
+| 403 | Not authorized (not the owner) |
+| 404 | Upload not found |
+
+<Warning>
+  Deletion is permanent and cannot be undone. All associated votes and tags are also removed.
+</Warning>
