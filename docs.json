@@ -7,7 +7,7 @@
     "light": "#A78BFA",
     "dark": "#7C3AED"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/images/favicon.ico",
   "navigation": {
     "tabs": [
       {
@@ -91,32 +91,10 @@
               "api-reference/user/profile",
               "api-reference/user/uploads"
             ]
-          },
-          {
-            "group": "Admin",
-            "pages": [
-              "api-reference/admin/overview",
-              "api-reference/admin/users",
-              "api-reference/admin/uploads",
-              "api-reference/admin/moderation"
-            ]
           }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "API Status",
-          "href": "https://status.fucksornot.com",
-          "icon": "signal"
-        }
-      ]
-    }
-  },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    ]
   },
   "navbar": {
     "links": [
@@ -135,12 +113,6 @@
     "baseUrl": "https://api.fucksornot.com",
     "auth": {
       "method": "bearer"
-    }
-  },
-  "footer": {
-    "socials": {
-      "x": "https://x.com/fonapp",
-      "github": "https://github.com/fon"
     }
   }
 }
