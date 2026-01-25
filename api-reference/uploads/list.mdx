@@ -10,7 +10,7 @@ Get a paginated list of all public uploads.
 ### Request
 
 ```bash
-curl "https://api.fon.app/api/uploads?page=1&limit=12"
+curl "https://api.fucksornot.com/api/uploads?page=1&limit=12"
 ```
 
 ### Parameters
@@ -52,7 +52,7 @@ Get uploads filtered by tags.
 ### Request
 
 ```bash
-curl "https://api.fon.app/api/uploads/filtered?tags=gadget,tech&page=1"
+curl "https://api.fucksornot.com/api/uploads/filtered?tags=gadget,tech&page=1"
 ```
 
 ### Parameters
@@ -70,7 +70,7 @@ curl "https://api.fon.app/api/uploads/filtered?tags=gadget,tech&page=1"
 Get uploads with similar tags, excluding the current one:
 
 ```bash
-curl "https://api.fon.app/api/uploads/filtered?tags=gadget&excludeUploadId=current-upload-uuid"
+curl "https://api.fucksornot.com/api/uploads/filtered?tags=gadget&excludeUploadId=current-upload-uuid"
 ```
 
 ---
@@ -82,7 +82,7 @@ Get the 6 most recently uploaded items.
 ### Request
 
 ```bash
-curl https://api.fon.app/api/items-recent
+curl https://api.fucksornot.com/api/items-recent
 ```
 
 ### Response
@@ -107,7 +107,7 @@ Get the highest voted items.
 ### Request
 
 ```bash
-curl "https://api.fon.app/api/items-top-voted?limit=10&timeRange=week"
+curl "https://api.fucksornot.com/api/items-top-voted?limit=10&timeRange=week"
 ```
 
 ### Parameters

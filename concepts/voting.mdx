@@ -14,7 +14,7 @@ Voting is central to FoN. Users vote on whether content "fucks" or "does not fuc
 Registered users can cast votes that carry full weight:
 
 ```bash
-curl -X POST https://api.fon.app/api/vote \
+curl -X POST https://api.fucksornot.com/api/vote \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -32,7 +32,7 @@ curl -X POST https://api.fon.app/api/vote \
 Unauthenticated users can also vote using browser fingerprinting:
 
 ```bash
-curl -X POST https://api.fon.app/api/vote/anonymous \
+curl -X POST https://api.fucksornot.com/api/vote/anonymous \
   -H "Content-Type: application/json" \
   -d '{
     "uploadId": "upload-uuid",
@@ -70,7 +70,7 @@ Successful votes return the vote record:
 Retrieve all votes you've cast:
 
 ```bash
-curl https://api.fon.app/api/vote \
+curl https://api.fucksornot.com/api/vote \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 

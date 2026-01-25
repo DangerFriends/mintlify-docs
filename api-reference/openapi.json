@@ -5,12 +5,12 @@
     "description": "API for the FoN (Fucks or Not) community voting platform. Upload images and links, vote on content, and discover what fucks.",
     "version": "1.0.0",
     "contact": {
-      "email": "support@fon.app"
+      "email": "support@fucksornot.com"
     }
   },
   "servers": [
     {
-      "url": "https://api.fon.app",
+      "url": "https://api.fucksornot.com",
       "description": "Production server"
     }
   ],

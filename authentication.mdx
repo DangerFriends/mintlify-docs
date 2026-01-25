@@ -22,7 +22,7 @@ When you log in through the web interface, a secure HTTP-only cookie (`auth-toke
 JSON Web Tokens are returned when you authenticate via the API. They're valid for 24 hours.
 
 ```bash
-curl -X POST https://api.fon.app/api/auth \
+curl -X POST https://api.fucksornot.com/api/auth \
   -H "Content-Type: application/json" \
   -d '{
     "action": "login",
@@ -47,7 +47,7 @@ curl -X POST https://api.fon.app/api/auth \
 Use the token in the `Authorization` header:
 
 ```bash
-curl https://api.fon.app/api/profile \
+curl https://api.fucksornot.com/api/profile \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 ```
 
@@ -58,7 +58,7 @@ API tokens are long-lived tokens designed for programmatic access. They're ideal
 #### Generate a Token
 
 ```bash
-curl -X POST https://api.fon.app/api/auth/tokens/generate \
+curl -X POST https://api.fucksornot.com/api/auth/tokens/generate \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"name": "Upload Script"}'
@@ -81,7 +81,7 @@ curl -X POST https://api.fon.app/api/auth/tokens/generate \
 #### Use the Token
 
 ```bash
-curl -X POST https://api.fon.app/api/v1/upload \
+curl -X POST https://api.fucksornot.com/api/v1/upload \
   -H "Authorization: Bearer fon_live_abc123..." \
   -F "upload_type=image" \
   -F "description=My upload" \
@@ -91,7 +91,7 @@ curl -X POST https://api.fon.app/api/v1/upload \
 #### Revoke a Token
 
 ```bash
-curl -X DELETE https://api.fon.app/api/auth/tokens/TOKEN_ID \
+curl -X DELETE https://api.fucksornot.com/api/auth/tokens/TOKEN_ID \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
@@ -111,7 +111,7 @@ For enhanced security, enable MFA on your account.
 ### Setup MFA
 
 ```bash
-curl -X POST https://api.fon.app/api/auth/mfa/setup \
+curl -X POST https://api.fucksornot.com/api/auth/mfa/setup \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
@@ -134,7 +134,7 @@ curl -X POST https://api.fon.app/api/auth/mfa/setup \
   <Step title="Verify Setup">
     Enter a code from your authenticator to verify setup:
     ```bash
-    curl -X POST https://api.fon.app/api/auth/mfa/verify \
+    curl -X POST https://api.fucksornot.com/api/auth/mfa/verify \
       -H "Authorization: Bearer YOUR_JWT_TOKEN" \
       -H "Content-Type: application/json" \
       -d '{"mfaCode": "123456"}'
@@ -150,7 +150,7 @@ curl -X POST https://api.fon.app/api/auth/mfa/setup \
 When MFA is enabled, include the code in your login request:
 
 ```bash
-curl -X POST https://api.fon.app/api/auth \
+curl -X POST https://api.fucksornot.com/api/auth \
   -H "Content-Type: application/json" \
   -d '{
     "action": "login",
@@ -165,7 +165,7 @@ curl -X POST https://api.fon.app/api/auth \
 ### Change Password
 
 ```bash
-curl -X POST https://api.fon.app/api/auth/change-password \
+curl -X POST https://api.fucksornot.com/api/auth/change-password \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -181,7 +181,7 @@ curl -X POST https://api.fon.app/api/auth/change-password \
 Request a password reset email:
 
 ```bash
-curl -X POST https://api.fon.app/api/auth/forgot-password \
+curl -X POST https://api.fucksornot.com/api/auth/forgot-password \
   -H "Content-Type: application/json" \
   -d '{"email": "you@example.com"}'
 ```
@@ -189,7 +189,7 @@ curl -X POST https://api.fon.app/api/auth/forgot-password \
 Use the reset token from the email:
 
 ```bash
-curl -X POST https://api.fon.app/api/auth/reset-password \
+curl -X POST https://api.fucksornot.com/api/auth/reset-password \
   -H "Content-Type: application/json" \
   -d '{
     "token": "reset_token_from_email",

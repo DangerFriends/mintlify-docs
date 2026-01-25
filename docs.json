@@ -108,7 +108,7 @@
       "anchors": [
         {
           "anchor": "API Status",
-          "href": "https://status.fon.app",
+          "href": "https://status.fucksornot.com",
           "icon": "signal"
         }
       ]
@@ -122,17 +122,17 @@
     "links": [
       {
         "label": "Support",
-        "href": "mailto:support@fon.app"
+        "href": "mailto:support@fucksornot.com"
       }
     ],
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://fon.app/dashboard"
+      "href": "https://fucksornot.com/dashboard"
     }
   },
   "api": {
-    "baseUrl": "https://api.fon.app",
+    "baseUrl": "https://api.fucksornot.com",
     "auth": {
       "method": "bearer"
     }

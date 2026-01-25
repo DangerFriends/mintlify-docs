@@ -12,7 +12,7 @@ Create a new API token.
 ### Request
 
 ```bash
-curl -X POST https://api.fon.app/api/auth/tokens/generate \
+curl -X POST https://api.fucksornot.com/api/auth/tokens/generate \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"name": "Upload Script"}'
@@ -42,7 +42,7 @@ Get all API tokens for your account.
 ### Request
 
 ```bash
-curl https://api.fon.app/api/auth/tokens \
+curl https://api.fucksornot.com/api/auth/tokens \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
@@ -75,7 +75,7 @@ Delete a token to revoke its access.
 ### Request
 
 ```bash
-curl -X DELETE https://api.fon.app/api/auth/tokens/TOKEN_ID \
+curl -X DELETE https://api.fucksornot.com/api/auth/tokens/TOKEN_ID \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
@@ -94,7 +94,7 @@ curl -X DELETE https://api.fon.app/api/auth/tokens/TOKEN_ID \
 Use API tokens with the `/api/v1/upload` endpoint:
 
 ```bash
-curl -X POST https://api.fon.app/api/v1/upload \
+curl -X POST https://api.fucksornot.com/api/v1/upload \
   -H "Authorization: Bearer fon_live_abc123def456..." \
   -F "upload_type=image" \
   -F "description=My upload" \

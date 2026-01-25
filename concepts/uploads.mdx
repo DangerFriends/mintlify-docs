@@ -20,7 +20,7 @@ Upload an image file directly to FoN.
 **Size limit:** 10 MB
 
 ```bash
-curl -X POST https://api.fon.app/api/v1/upload \
+curl -X POST https://api.fucksornot.com/api/v1/upload \
   -H "Authorization: Bearer YOUR_API_TOKEN" \
   -F "upload_type=image" \
   -F "description=Check out this gadget" \
@@ -32,7 +32,7 @@ curl -X POST https://api.fon.app/api/v1/upload \
 Submit a URL to an image hosted elsewhere. FoN will fetch and process the image.
 
 ```bash
-curl -X POST https://api.fon.app/api/v1/upload \
+curl -X POST https://api.fucksornot.com/api/v1/upload \
   -H "Authorization: Bearer YOUR_API_TOKEN" \
   -F "upload_type=image_url" \
   -F "description=Cool find from the web" \
@@ -52,7 +52,7 @@ Submit a link to external content. FoN supports rich embeds for popular platform
 - Spotify
 
 ```bash
-curl -X POST https://api.fon.app/api/v1/upload \
+curl -X POST https://api.fucksornot.com/api/v1/upload \
   -H "Authorization: Bearer YOUR_API_TOKEN" \
   -F "upload_type=link" \
   -F "description=Great video" \
@@ -102,7 +102,7 @@ Uploaded images are automatically:
 Uploads can be set as private:
 
 ```bash
-curl -X PATCH https://api.fon.app/api/upload/UPLOAD_ID/privacy \
+curl -X PATCH https://api.fucksornot.com/api/upload/UPLOAD_ID/privacy \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"is_private": true}'
@@ -118,7 +118,7 @@ Private uploads:
 Add tags to help categorize your upload:
 
 ```bash
-curl -X POST https://api.fon.app/api/v1/upload \
+curl -X POST https://api.fucksornot.com/api/v1/upload \
   -H "Authorization: Bearer YOUR_API_TOKEN" \
   -F "upload_type=image" \
   -F "description=My upload" \
@@ -139,7 +139,7 @@ Uploads are rate limited to **20 per hour** per user to prevent abuse.
 Users can delete their own uploads:
 
 ```bash
-curl -X DELETE https://api.fon.app/api/upload/UPLOAD_ID \
+curl -X DELETE https://api.fucksornot.com/api/upload/UPLOAD_ID \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 

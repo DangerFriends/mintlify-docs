@@ -10,7 +10,7 @@ Shadow ban a user. Their votes are recorded but don't affect counts.
 ### Request
 
 ```bash
-curl -X POST https://api.fon.app/api/admin/users/USER_ID/shadow-ban \
+curl -X POST https://api.fucksornot.com/api/admin/users/USER_ID/shadow-ban \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"isBanned": true}'
@@ -46,7 +46,7 @@ Get anonymous voting data for analysis.
 ### Request
 
 ```bash
-curl "https://api.fon.app/api/admin/anonymous-votes?limit=50&days=7&stats=true" \
+curl "https://api.fucksornot.com/api/admin/anonymous-votes?limit=50&days=7&stats=true" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
@@ -86,7 +86,7 @@ curl "https://api.fon.app/api/admin/anonymous-votes?limit=50&days=7&stats=true" 
 ### List Reports
 
 ```bash
-curl "https://api.fon.app/api/admin/issue-reports?page=1&status=open" \
+curl "https://api.fucksornot.com/api/admin/issue-reports?page=1&status=open" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
@@ -101,7 +101,7 @@ curl "https://api.fon.app/api/admin/issue-reports?page=1&status=open" \
 ### Update Report Status
 
 ```bash
-curl -X PATCH https://api.fon.app/api/admin/issue-reports/REPORT_ID/status \
+curl -X PATCH https://api.fucksornot.com/api/admin/issue-reports/REPORT_ID/status \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"status": "resolved"}'

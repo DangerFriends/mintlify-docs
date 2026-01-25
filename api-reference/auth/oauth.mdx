@@ -21,7 +21,7 @@ OAuth authentication follows the standard flow:
   <Step title="Initiate OAuth">
     Redirect the user to the OAuth initiation endpoint:
     ```
-    https://api.fon.app/api/auth/oauth/google
+    https://api.fucksornot.com/api/auth/oauth/google
     ```
   </Step>
   <Step title="User Authenticates">
@@ -42,7 +42,7 @@ OAuth authentication follows the standard flow:
 For web applications, simply link to the OAuth endpoint:
 
 ```html
-<a href="https://api.fon.app/api/auth/oauth/google">
+<a href="https://api.fucksornot.com/api/auth/oauth/google">
   Sign in with Google
 </a>
 ```
@@ -54,7 +54,7 @@ For SPAs, open a popup or redirect:
 ```javascript
 // Popup method
 const popup = window.open(
-  'https://api.fon.app/api/auth/oauth/google',
+  'https://api.fucksornot.com/api/auth/oauth/google',
   'oauth',
   'width=500,height=600'
 );
@@ -79,7 +79,7 @@ import * as WebBrowser from 'expo-web-browser';
 
 const signInWithGoogle = async () => {
   const result = await WebBrowser.openAuthSessionAsync(
-    'https://api.fon.app/api/auth/oauth/google',
+    'https://api.fucksornot.com/api/auth/oauth/google',
     'your-app://callback'
   );
 };
@@ -96,7 +96,7 @@ After successful OAuth authentication:
 Use the [Check Status](/api-reference/auth/check-status) endpoint to verify authentication:
 
 ```bash
-curl https://api.fon.app/api/auth/check \
+curl https://api.fucksornot.com/api/auth/check \
   --cookie "auth-token=..."
 ```
 

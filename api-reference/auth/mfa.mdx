@@ -10,7 +10,7 @@ Initialize MFA setup for the authenticated user.
 ### Request
 
 ```bash
-curl -X POST https://api.fon.app/api/auth/mfa/setup \
+curl -X POST https://api.fucksornot.com/api/auth/mfa/setup \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
@@ -54,7 +54,7 @@ Complete MFA setup by verifying a TOTP code from your authenticator app.
 ### Request
 
 ```bash
-curl -X POST https://api.fon.app/api/auth/mfa/verify \
+curl -X POST https://api.fucksornot.com/api/auth/mfa/verify \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"mfaCode": "123456"}'
@@ -79,7 +79,7 @@ Disable MFA on your account. Requires a valid MFA code.
 ### Request
 
 ```bash
-curl -X POST https://api.fon.app/api/auth/mfa/disable \
+curl -X POST https://api.fucksornot.com/api/auth/mfa/disable \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"mfaCode": "123456"}'

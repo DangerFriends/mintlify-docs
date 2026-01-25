@@ -8,7 +8,7 @@ Retrieve the full image for an upload.
 ## Request
 
 ```bash
-curl https://api.fon.app/api/image/550e8400-e29b-41d4-a716-446655440000
+curl https://api.fucksornot.com/api/image/550e8400-e29b-41d4-a716-446655440000
 ```
 
 ## Response
@@ -39,7 +39,7 @@ Images are aggressively cached:
 Use the `ETag` header for conditional requests:
 
 ```bash
-curl https://api.fon.app/api/image/550e8400-e29b-41d4-a716-446655440000 \
+curl https://api.fucksornot.com/api/image/550e8400-e29b-41d4-a716-446655440000 \
   -H "If-None-Match: \"abc123\""
 ```
 
@@ -57,7 +57,7 @@ Private images return `404 Not Found` if accessed without authorization.
 For embedding in HTML:
 
 ```html
-<img src="https://api.fon.app/api/image/550e8400-e29b-41d4-a716-446655440000"
+<img src="https://api.fucksornot.com/api/image/550e8400-e29b-41d4-a716-446655440000"
      alt="Upload image" />
 ```
 

@@ -10,7 +10,7 @@ Get a paginated list of all uploads including private ones.
 ### Request
 
 ```bash
-curl "https://api.fon.app/api/admin/uploads?page=1&limit=20&search=gadget" \
+curl "https://api.fucksornot.com/api/admin/uploads?page=1&limit=20&search=gadget" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
@@ -55,7 +55,7 @@ Delete any upload.
 ### Request
 
 ```bash
-curl -X DELETE https://api.fon.app/api/admin/uploads/UPLOAD_ID \
+curl -X DELETE https://api.fucksornot.com/api/admin/uploads/UPLOAD_ID \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
@@ -76,7 +76,7 @@ Remove a specific tag from an upload.
 ### Request
 
 ```bash
-curl -X DELETE https://api.fon.app/api/admin/uploads/UPLOAD_ID/tags/TAG_ID \
+curl -X DELETE https://api.fucksornot.com/api/admin/uploads/UPLOAD_ID/tags/TAG_ID \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
@@ -97,7 +97,7 @@ Delete a tag entirely (removes from all uploads).
 ### Request
 
 ```bash
-curl -X DELETE https://api.fon.app/api/admin/tags/TAG_ID \
+curl -X DELETE https://api.fucksornot.com/api/admin/tags/TAG_ID \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
@@ -122,6 +122,6 @@ Get all tags with admin context.
 ### Request
 
 ```bash
-curl "https://api.fon.app/api/admin/tags?page=1&limit=50" \
+curl "https://api.fucksornot.com/api/admin/tags?page=1&limit=50" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```

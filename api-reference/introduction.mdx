@@ -8,7 +8,7 @@ description: 'Complete reference for the FoN API'
 The FoN API is a RESTful API that allows you to interact with the FoN platform programmatically. All requests should be made to the base URL:
 
 ```
-https://api.fon.app
+https://api.fucksornot.com
 ```
 
 ## Authentication
@@ -26,7 +26,7 @@ Most endpoints require authentication. The API supports multiple authentication 
 
 ```bash
 # Using Bearer token
-curl https://api.fon.app/api/profile \
+curl https://api.fucksornot.com/api/profile \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
@@ -37,7 +37,7 @@ curl https://api.fon.app/api/profile \
 For endpoints that accept JSON, set the `Content-Type` header:
 
 ```bash
-curl -X POST https://api.fon.app/api/auth \
+curl -X POST https://api.fucksornot.com/api/auth \
   -H "Content-Type: application/json" \
   -d '{"action": "login", "email": "...", "password": "..."}'
 ```
@@ -47,7 +47,7 @@ curl -X POST https://api.fon.app/api/auth \
 For file uploads, use `multipart/form-data`:
 
 ```bash
-curl -X POST https://api.fon.app/api/upload \
+curl -X POST https://api.fucksornot.com/api/upload \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -F "upload_type=image" \
   -F "description=My upload" \
@@ -113,7 +113,7 @@ List endpoints support pagination via query parameters:
 | `limit` | integer | 12 | Items per page (max 50) |
 
 ```bash
-curl "https://api.fon.app/api/uploads?page=2&limit=20"
+curl "https://api.fucksornot.com/api/uploads?page=2&limit=20"
 ```
 
 Response includes pagination info:

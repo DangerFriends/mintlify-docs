@@ -14,7 +14,7 @@ Tags help categorize and discover content on FoN. Users can add tags when upload
 Include tags as a comma-separated string:
 
 ```bash
-curl -X POST https://api.fon.app/api/v1/upload \
+curl -X POST https://api.fucksornot.com/api/v1/upload \
   -H "Authorization: Bearer YOUR_API_TOKEN" \
   -F "upload_type=image" \
   -F "description=New gadget" \
@@ -27,7 +27,7 @@ curl -X POST https://api.fon.app/api/v1/upload \
 Add tags to an existing upload:
 
 ```bash
-curl -X POST https://api.fon.app/api/uploads/UPLOAD_ID/tags \
+curl -X POST https://api.fucksornot.com/api/uploads/UPLOAD_ID/tags \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"tags": ["new-tag", "another-tag"]}'
@@ -53,7 +53,7 @@ curl -X POST https://api.fon.app/api/uploads/UPLOAD_ID/tags \
 Get all tags with upload counts:
 
 ```bash
-curl https://api.fon.app/api/tags?page=1&limit=20 \
+curl https://api.fucksornot.com/api/tags?page=1&limit=20 \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
@@ -79,7 +79,7 @@ Response:
 Find tags matching a query:
 
 ```bash
-curl "https://api.fon.app/api/tags/search?q=tech&limit=10"
+curl "https://api.fucksornot.com/api/tags/search?q=tech&limit=10"
 ```
 
 Response:
@@ -106,13 +106,13 @@ Response:
 Get uploads with specific tags:
 
 ```bash
-curl "https://api.fon.app/api/uploads/filtered?tags=gadget,tech"
+curl "https://api.fucksornot.com/api/uploads/filtered?tags=gadget,tech"
 ```
 
 Exclude certain tags:
 
 ```bash
-curl "https://api.fon.app/api/uploads/filtered?tags=gadget&excludeTags=nsfw"
+curl "https://api.fucksornot.com/api/uploads/filtered?tags=gadget&excludeTags=nsfw"
 ```
 
 ## Getting Upload Tags
@@ -120,7 +120,7 @@ curl "https://api.fon.app/api/uploads/filtered?tags=gadget&excludeTags=nsfw"
 Retrieve tags for a specific upload:
 
 ```bash
-curl https://api.fon.app/api/uploads/UPLOAD_ID/tags
+curl https://api.fucksornot.com/api/uploads/UPLOAD_ID/tags
 ```
 
 Response:
@@ -142,7 +142,7 @@ Response:
 FoN can suggest tags for an upload using AI:
 
 ```bash
-curl -X POST https://api.fon.app/api/tags/suggest \
+curl -X POST https://api.fucksornot.com/api/tags/suggest \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"uploadId": "upload-uuid"}'
