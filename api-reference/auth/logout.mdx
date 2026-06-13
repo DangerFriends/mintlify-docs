@@ -17,9 +17,7 @@ curl -X POST https://fucksornot.com/api/auth/logout \
 ```javascript JavaScript
 const response = await fetch('https://fucksornot.com/api/auth/logout', {
   method: 'POST',
-  headers: {
-    'Cookie': 'auth-token=YOUR_JWT_TOKEN'
-  }
+  credentials: 'include'
 });
 ```
 

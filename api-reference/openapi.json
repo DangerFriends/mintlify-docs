@@ -228,6 +228,7 @@
                   "type": "object",
                   "properties": {
                     "statusCode": { "type": "integer", "example": 401 },
+                    "statusMessage": { "type": "string", "example": "Unauthorized" },
                     "message": { "type": "string", "example": "Additional verification required" },
                     "data": {
                       "type": "object",

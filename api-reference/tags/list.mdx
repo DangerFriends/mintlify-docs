@@ -16,9 +16,7 @@ curl "https://fucksornot.com/api/tags?page=1&limit=10" \
 
 ```javascript JavaScript
 const response = await fetch('https://fucksornot.com/api/tags?page=1&limit=10', {
-  headers: {
-    'Cookie': 'auth-token=YOUR_JWT_TOKEN'
-  }
+  credentials: 'include'
 });
 ```
 

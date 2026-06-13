@@ -60,17 +60,15 @@ curl "https://fucksornot.com/api/uploads/filtered?tags=gadget,tech&page=1"
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `tags` | string | - | Comma-separated tag names to include |
-| `excludeTags` | string | - | Comma-separated tag names to exclude |
-| `excludeUploadId` | UUID | - | Upload to exclude from results |
 | `page` | integer | 1 | Page number |
 | `limit` | integer | 10 | Items per page (max 100) |
 
 ### Example: Related Content
 
-Get uploads with similar tags, excluding the current one:
+Get uploads with similar tags:
 
 ```bash
-curl "https://fucksornot.com/api/uploads/filtered?tags=gadget&excludeUploadId=current-upload-uuid"
+curl "https://fucksornot.com/api/uploads/filtered?tags=gadget&page=1&limit=10"
 ```
 
 ### Response
