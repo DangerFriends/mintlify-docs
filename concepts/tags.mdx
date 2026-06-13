@@ -14,7 +14,7 @@ Tags help categorize and discover content on FoN. Users can add tags when upload
 Include tags as a comma-separated string:
 
 ```bash
-curl -X POST https://api.fucksornot.com/api/v1/upload \
+curl -X POST https://fucksornot.com/api/v1/upload \
   -H "Authorization: Bearer YOUR_API_TOKEN" \
   -F "upload_type=image" \
   -F "description=New gadget" \
@@ -27,8 +27,8 @@ curl -X POST https://api.fucksornot.com/api/v1/upload \
 Add tags to an existing upload:
 
 ```bash
-curl -X POST https://api.fucksornot.com/api/uploads/UPLOAD_ID/tags \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+curl -X POST https://fucksornot.com/api/uploads/UPLOAD_ID/tags \
+  -H "Cookie: auth-token=YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"tags": ["new-tag", "another-tag"]}'
 ```
@@ -45,16 +45,17 @@ curl -X POST https://api.fucksornot.com/api/uploads/UPLOAD_ID/tags \
 ## Tag Limits
 
 - Maximum **10 tags** per upload
-- Tags are normalized to lowercase
-- Special characters are removed
+- Tag names must be between **2 and 50 characters**
+- Tag names can only contain letters, numbers, spaces, and hyphens — tags with other characters are rejected with a `400` error rather than being stripped
+- Tag names are trimmed, but their case is preserved; only the generated `slug` is lowercased
 
 ## Listing Tags
 
 Get all tags with upload counts:
 
 ```bash
-curl https://api.fucksornot.com/api/tags?page=1&limit=20 \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+curl "https://fucksornot.com/api/tags?page=1&limit=10" \
+  -H "Cookie: auth-token=YOUR_JWT_TOKEN"
 ```
 
 Response:
@@ -70,16 +71,18 @@ Response:
     }
   ],
   "page": 1,
-  "limit": 20
+  "limit": 10
 }
 ```
+
+The `limit` defaults to **10** and can be set up to a maximum of **100**.
 
 ## Searching Tags
 
 Find tags matching a query:
 
 ```bash
-curl "https://api.fucksornot.com/api/tags/search?q=tech&limit=10"
+curl "https://fucksornot.com/api/tags/search?q=tech&limit=10"
 ```
 
 Response:
@@ -101,26 +104,32 @@ Response:
 }
 ```
 
+For more advanced, meaning-based matching, FoN also offers `GET /api/tags/semantic-search`, an AI-powered semantic tag search.
+
 ## Filtering by Tags
 
-Get uploads with specific tags:
+Browse uploads matching one or more tag slugs using `GET /api/tags/browse`:
 
 ```bash
-curl "https://api.fucksornot.com/api/uploads/filtered?tags=gadget,tech"
+curl "https://fucksornot.com/api/tags/browse?tags=gadget,tech" \
+  -H "Cookie: auth-token=YOUR_JWT_TOKEN"
 ```
 
-Exclude certain tags:
+Sort the results with the `sort` parameter (`name`, `date`, or `votes`; defaults to `date`):
 
 ```bash
-curl "https://api.fucksornot.com/api/uploads/filtered?tags=gadget&excludeTags=nsfw"
+curl "https://fucksornot.com/api/tags/browse?tags=gadget,tech&sort=votes" \
+  -H "Cookie: auth-token=YOUR_JWT_TOKEN"
 ```
+
+This endpoint also supports standard pagination via `page` and `limit`. There is no way to exclude tags — only matching by the provided `tags` is supported.
 
 ## Getting Upload Tags
 
 Retrieve tags for a specific upload:
 
 ```bash
-curl https://api.fucksornot.com/api/uploads/UPLOAD_ID/tags
+curl https://fucksornot.com/api/uploads/UPLOAD_ID/tags
 ```
 
 Response:
@@ -139,22 +148,27 @@ Response:
 
 ## AI-Suggested Tags
 
-FoN can suggest tags for an upload using AI:
+FoN can suggest tags using AI, based on a description and/or an image. Send a JSON body with `description` and/or `imageUrl` (at least one is required):
 
 ```bash
-curl -X POST https://api.fucksornot.com/api/tags/suggest \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+curl -X POST https://fucksornot.com/api/tags/suggest \
+  -H "Cookie: auth-token=YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"uploadId": "upload-uuid"}'
+  -d '{"description": "A new gadget", "imageUrl": "https://example.com/image.jpg"}'
 ```
+
+You can also send `multipart/form-data` with `description`, `image_url`, and/or `file` fields (e.g. to suggest tags directly from an uploaded image file).
 
 Response:
 
 ```json
 {
-  "suggestedTags": ["electronics", "gadget", "tech"]
+  "suggestions": ["electronics", "gadget", "tech"],
+  "fallback": false
 }
 ```
+
+`fallback` is `true` if the AI suggestion failed and a fallback heuristic was used instead. This endpoint is rate-limited, and may return a `503` error if tag generation fails entirely.
 
 ## Best Practices
 

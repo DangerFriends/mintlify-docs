@@ -10,14 +10,14 @@ Get all tags with upload counts.
 <CodeGroup>
 
 ```bash cURL
-curl "https://api.fucksornot.com/api/tags?page=1&limit=20" \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+curl "https://fucksornot.com/api/tags?page=1&limit=10" \
+  -H "Cookie: auth-token=YOUR_JWT_TOKEN"
 ```
 
 ```javascript JavaScript
-const response = await fetch('https://api.fucksornot.com/api/tags?page=1&limit=20', {
+const response = await fetch('https://fucksornot.com/api/tags?page=1&limit=10', {
   headers: {
-    'Authorization': 'Bearer YOUR_JWT_TOKEN'
+    'Cookie': 'auth-token=YOUR_JWT_TOKEN'
   }
 });
 ```
@@ -29,7 +29,7 @@ const response = await fetch('https://api.fucksornot.com/api/tags?page=1&limit=2
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `page` | integer | 1 | Page number |
-| `limit` | integer | 20 | Items per page |
+| `limit` | integer | 10 | Items per page (max 100) |
 
 ## Response
 
@@ -50,7 +50,7 @@ const response = await fetch('https://api.fucksornot.com/api/tags?page=1&limit=2
     }
   ],
   "page": 1,
-  "limit": 20
+  "limit": 10
 }
 ```
 

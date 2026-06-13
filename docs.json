@@ -105,7 +105,7 @@
     ]
   },
   "api": {
-    "baseUrl": "https://api.fucksornot.com",
+    "baseUrl": "https://fucksornot.com",
     "auth": {
       "method": "bearer"
     }

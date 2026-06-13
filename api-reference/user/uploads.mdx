@@ -10,11 +10,11 @@ Get public uploads from a specific user.
 <CodeGroup>
 
 ```bash cURL
-curl https://api.fucksornot.com/api/user/johndoe/uploads
+curl https://fucksornot.com/api/user/johndoe/uploads
 ```
 
 ```javascript JavaScript
-const response = await fetch('https://api.fucksornot.com/api/user/johndoe/uploads');
+const response = await fetch('https://fucksornot.com/api/user/johndoe/uploads');
 const data = await response.json();
 ```
 
@@ -26,10 +26,23 @@ const data = await response.json();
 |-----------|------|-------------|
 | `username` | string | Username to look up |
 
+## Query Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `page` | integer | Page number to retrieve. Optional, defaults to `1`. |
+| `limit` | integer | Number of uploads per page. Optional, defaults to `12`, maximum `50`. |
+| `sort` | string | Sort order: `date`, `votes`, or `name`. Optional, defaults to `date`. |
+| `tags` | string | Comma-separated list of tag slugs to filter uploads by. Optional. |
+
 ## Response
 
 ```json
 {
+  "user": {
+    "username": "johndoe",
+    "created_at": "2024-01-15T10:30:00Z"
+  },
   "uploads": [
     {
       "id": "upload-uuid-1",
@@ -54,10 +67,22 @@ const data = await response.json();
       "tags": [...]
     }
   ],
-  "username": "johndoe",
-  "uploadCount": 42
+  "total": 42,
+  "page": 1,
+  "totalPages": 5,
+  "limit": 12
 }
 ```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `user.username` | string | The looked-up user's username |
+| `user.created_at` | string | The user's account creation timestamp |
+| `uploads` | array | The uploads for the current page |
+| `total` | integer | Total number of public uploads matching the query |
+| `page` | integer | The current page number |
+| `totalPages` | integer | Total number of pages available |
+| `limit` | integer | Number of uploads per page |
 
 ## Notes
 

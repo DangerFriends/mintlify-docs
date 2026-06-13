@@ -12,7 +12,7 @@ This guide will help you make your first API call to FoN.
 Before using the API, you need a FoN account. Register at [fucksornot.com](https://fucksornot.com) or use the API:
 
 ```bash
-curl -X POST https://api.fucksornot.com/api/auth \
+curl -X POST https://fucksornot.com/api/auth \
   -H "Content-Type: application/json" \
   -d '{
     "action": "register",
@@ -27,7 +27,7 @@ curl -X POST https://api.fucksornot.com/api/auth \
 For programmatic access, generate an API token. First, log in:
 
 ```bash
-curl -X POST https://api.fucksornot.com/api/auth \
+curl -X POST https://fucksornot.com/api/auth \
   -H "Content-Type: application/json" \
   -d '{
     "action": "login",
@@ -39,7 +39,7 @@ curl -X POST https://api.fucksornot.com/api/auth \
 Save the JWT token from the response, then generate an API token:
 
 ```bash
-curl -X POST https://api.fucksornot.com/api/auth/tokens/generate \
+curl -X POST https://fucksornot.com/api/auth/tokens/generate \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"name": "My Script"}'
@@ -54,7 +54,7 @@ curl -X POST https://api.fucksornot.com/api/auth/tokens/generate \
 Upload an image using your API token:
 
 ```bash
-curl -X POST https://api.fucksornot.com/api/v1/upload \
+curl -X POST https://fucksornot.com/api/v1/upload \
   -H "Authorization: Bearer YOUR_API_TOKEN" \
   -F "upload_type=image" \
   -F "description=Check out this cool thing" \
@@ -67,7 +67,7 @@ curl -X POST https://api.fucksornot.com/api/v1/upload \
 List recent uploads (no authentication required):
 
 ```bash
-curl https://api.fucksornot.com/api/uploads?page=1&limit=10
+curl https://fucksornot.com/api/uploads?page=1&limit=10
 ```
 
 ### Step 5: Vote on Content
@@ -75,14 +75,18 @@ curl https://api.fucksornot.com/api/uploads?page=1&limit=10
 Vote on an upload:
 
 ```bash
-curl -X POST https://api.fucksornot.com/api/vote \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+curl -X POST https://fucksornot.com/api/vote \
+  -H "Cookie: auth-token=YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "uploadId": "upload-uuid-here",
     "vote": "fucks"
   }'
 ```
+
+<Note>
+  This endpoint, like most session-based endpoints, authenticates using the `auth-token` cookie that's set automatically when you log in via a browser. For non-browser clients, pass the same JWT returned by the login response as a cookie value, as shown above.
+</Note>
 
 ## Code Examples
 
@@ -102,7 +106,7 @@ async function uploadImage(filePath, description) {
   form.append('description', description);
   form.append('file', fs.createReadStream(filePath));
 
-  const response = await fetch('https://api.fucksornot.com/api/v1/upload', {
+  const response = await fetch('https://fucksornot.com/api/v1/upload', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${API_TOKEN}`
@@ -125,7 +129,7 @@ API_TOKEN = 'your_api_token'
 def upload_image(file_path, description):
     with open(file_path, 'rb') as f:
         response = requests.post(
-            'https://api.fucksornot.com/api/v1/upload',
+            'https://fucksornot.com/api/v1/upload',
             headers={'Authorization': f'Bearer {API_TOKEN}'},
             files={'file': f},
             data={
@@ -141,7 +145,7 @@ print(result)
 
 ```bash cURL
 # Upload an image
-curl -X POST https://api.fucksornot.com/api/v1/upload \
+curl -X POST https://fucksornot.com/api/v1/upload \
   -H "Authorization: Bearer YOUR_API_TOKEN" \
   -F "upload_type=image" \
   -F "description=Check this out!" \

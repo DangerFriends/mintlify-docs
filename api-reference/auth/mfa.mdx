@@ -10,8 +10,8 @@ Initialize MFA setup for the authenticated user.
 ### Request
 
 ```bash
-curl -X POST https://api.fucksornot.com/api/auth/mfa/setup \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+curl -X POST https://fucksornot.com/api/auth/mfa/setup \
+  -H "Cookie: auth-token=YOUR_JWT_TOKEN"
 ```
 
 ### Response
@@ -20,15 +20,18 @@ curl -X POST https://api.fucksornot.com/api/auth/mfa/setup \
 {
   "qrCode": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg...",
   "secret": "JBSWY3DPEHPK3PXP",
+  "otpauthUrl": "otpauth://totp/FoN:user@example.com?secret=JBSWY3DPEHPK3PXP&issuer=FoN",
   "backupCodes": [
-    "abc123def456",
-    "ghi789jkl012",
-    "mno345pqr678",
-    "stu901vwx234",
-    "yza567bcd890",
-    "efg123hij456",
-    "klm789nop012",
-    "qrs345tuv678"
+    "A1B2-C3D4-E5F6-A7B8",
+    "B2C3-D4E5-F6A7-B8C9",
+    "C3D4-E5F6-A7B8-C9D0",
+    "D4E5-F6A7-B8C9-D0E1",
+    "E5F6-A7B8-C9D0-E1F2",
+    "F6A7-B8C9-D0E1-F2A3",
+    "A7B8-C9D0-E1F2-A3B4",
+    "B8C9-D0E1-F2A3-B4C5",
+    "C9D0-E1F2-A3B4-C5D6",
+    "D0E1-F2A3-B4C5-D6E7"
   ]
 }
 ```
@@ -39,7 +42,8 @@ curl -X POST https://api.fucksornot.com/api/auth/mfa/setup \
 |-------|-------------|
 | `qrCode` | Base64 encoded QR code image to scan with authenticator app |
 | `secret` | TOTP secret for manual entry if QR scanning fails |
-| `backupCodes` | One-time use codes for account recovery (8 codes, 12 characters each) |
+| `otpauthUrl` | The `otpauth://` URI used by authenticator apps to configure TOTP automatically |
+| `backupCodes` | One-time use codes for account recovery (10 codes, formatted as `XXXX-XXXX-XXXX-XXXX`) |
 
 <Warning>
   Save your backup codes securely. They cannot be retrieved later and are needed if you lose access to your authenticator app.
@@ -54,8 +58,8 @@ Complete MFA setup by verifying a TOTP code from your authenticator app.
 ### Request
 
 ```bash
-curl -X POST https://api.fucksornot.com/api/auth/mfa/verify \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+curl -X POST https://fucksornot.com/api/auth/mfa/verify \
+  -H "Cookie: auth-token=YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"mfaCode": "123456"}'
 ```
@@ -74,15 +78,18 @@ After verification, MFA is enabled on your account and required for login.
 
 ## Disable MFA
 
-Disable MFA on your account. Requires a valid MFA code.
+Disable MFA on your account. Requires your current password and a valid MFA code.
 
 ### Request
 
 ```bash
-curl -X POST https://api.fucksornot.com/api/auth/mfa/disable \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+curl -X POST https://fucksornot.com/api/auth/mfa/disable \
+  -H "Cookie: auth-token=YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"mfaCode": "123456"}'
+  -d '{
+    "password": "current_password",
+    "mfaCode": "123456"
+  }'
 ```
 
 ### Response
@@ -92,6 +99,12 @@ curl -X POST https://api.fucksornot.com/api/auth/mfa/disable \
   "success": true
 }
 ```
+
+### Errors
+
+| Status | Message | Cause |
+|--------|---------|-------|
+| `400` | `Password is required to disable MFA` | The `password` field was omitted from the request body |
 
 ---
 
@@ -125,6 +138,6 @@ Backup codes can be used in place of TOTP codes. Each code can only be used once
   "action": "login",
   "email": "user@example.com",
   "password": "password",
-  "mfaCode": "abc123def456"
+  "mfaCode": "A1B2-C3D4-E5F6-A7B8"
 }
 ```

@@ -10,15 +10,15 @@ End the current session and revoke the JWT token.
 <CodeGroup>
 
 ```bash cURL
-curl -X POST https://api.fucksornot.com/api/auth/logout \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+curl -X POST https://fucksornot.com/api/auth/logout \
+  -H "Cookie: auth-token=YOUR_JWT_TOKEN"
 ```
 
 ```javascript JavaScript
-const response = await fetch('https://api.fucksornot.com/api/auth/logout', {
+const response = await fetch('https://fucksornot.com/api/auth/logout', {
   method: 'POST',
   headers: {
-    'Authorization': 'Bearer YOUR_JWT_TOKEN'
+    'Cookie': 'auth-token=YOUR_JWT_TOKEN'
   }
 });
 ```

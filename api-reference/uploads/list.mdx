@@ -10,7 +10,7 @@ Get a paginated list of all public uploads.
 ### Request
 
 ```bash
-curl "https://api.fucksornot.com/api/uploads?page=1&limit=12"
+curl "https://fucksornot.com/api/uploads?page=1&limit=10"
 ```
 
 ### Parameters
@@ -18,7 +18,7 @@ curl "https://api.fucksornot.com/api/uploads?page=1&limit=12"
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `page` | integer | 1 | Page number (1-indexed) |
-| `limit` | integer | 12 | Items per page (max 50) |
+| `limit` | integer | 10 | Items per page (max 100) |
 
 ### Response
 
@@ -39,7 +39,7 @@ curl "https://api.fucksornot.com/api/uploads?page=1&limit=12"
     }
   ],
   "page": 1,
-  "limit": 12
+  "limit": 10
 }
 ```
 
@@ -52,25 +52,49 @@ Get uploads filtered by tags.
 ### Request
 
 ```bash
-curl "https://api.fucksornot.com/api/uploads/filtered?tags=gadget,tech&page=1"
+curl "https://fucksornot.com/api/uploads/filtered?tags=gadget,tech&page=1"
 ```
 
 ### Parameters
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `tags` | string | Comma-separated tag names to include |
-| `excludeTags` | string | Comma-separated tag names to exclude |
-| `excludeUploadId` | UUID | Upload to exclude from results |
-| `page` | integer | Page number |
-| `limit` | integer | Items per page |
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `tags` | string | - | Comma-separated tag names to include |
+| `excludeTags` | string | - | Comma-separated tag names to exclude |
+| `excludeUploadId` | UUID | - | Upload to exclude from results |
+| `page` | integer | 1 | Page number |
+| `limit` | integer | 10 | Items per page (max 100) |
 
 ### Example: Related Content
 
 Get uploads with similar tags, excluding the current one:
 
 ```bash
-curl "https://api.fucksornot.com/api/uploads/filtered?tags=gadget&excludeUploadId=current-upload-uuid"
+curl "https://fucksornot.com/api/uploads/filtered?tags=gadget&excludeUploadId=current-upload-uuid"
+```
+
+### Response
+
+```json
+{
+  "uploads": [
+    {
+      "id": "upload-uuid",
+      "user_id": "user-uuid",
+      "filename": "abc123.webp",
+      "description": "Cool gadget",
+      "upload_type": "image",
+      "upvotes": 42,
+      "downvote_count": 5,
+      "created_at": "2025-01-24T12:00:00Z",
+      "tags": [...],
+      "username": "johndoe"
+    }
+  ],
+  "total": 37,
+  "page": 1,
+  "limit": 10
+}
 ```
 
 ---
@@ -82,7 +106,7 @@ Get the 6 most recently uploaded items.
 ### Request
 
 ```bash
-curl https://api.fucksornot.com/api/items-recent
+curl https://fucksornot.com/api/items-recent
 ```
 
 ### Response
@@ -106,25 +130,18 @@ Get the highest voted items.
 
 ### Request
 
+This endpoint takes **no query parameters**. It always returns the top 6 items ranked by votes — there is no way to change the count, page through results, or filter by time range.
+
 ```bash
-curl "https://api.fucksornot.com/api/items-top-voted?limit=10&timeRange=week"
+curl https://fucksornot.com/api/items-top-voted
 ```
-
-### Parameters
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `limit` | integer | 12 | Number of items |
-| `page` | integer | 1 | Page number |
-| `timeRange` | string | `all` | `day`, `week`, `month`, or `all` |
 
 ### Response
 
 ```json
 {
-  "uploads": [...],
-  "page": 1,
-  "limit": 10
+  "items": [...],
+  "type": "top-voted"
 }
 ```
 
@@ -136,4 +153,4 @@ curl "https://api.fucksornot.com/api/items-top-voted?limit=10&timeRange=week"
 |----------|----------------|
 | `/api/uploads` | 2 minutes |
 | `/api/items-recent` | 5 minutes |
-| `/api/items-top-voted` | 2 minutes |
+| `/api/items-top-voted` | 5 minutes |

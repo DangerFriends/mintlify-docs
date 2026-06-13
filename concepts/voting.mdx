@@ -14,8 +14,8 @@ Voting is central to FoN. Users vote on whether content "fucks" or "does not fuc
 Registered users can cast votes that carry full weight:
 
 ```bash
-curl -X POST https://api.fucksornot.com/api/vote \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+curl -X POST https://fucksornot.com/api/vote \
+  -H "Cookie: auth-token=YOUR_JWT_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "uploadId": "upload-uuid",
@@ -32,7 +32,7 @@ curl -X POST https://api.fucksornot.com/api/vote \
 Unauthenticated users can also vote using browser fingerprinting:
 
 ```bash
-curl -X POST https://api.fucksornot.com/api/vote/anonymous \
+curl -X POST https://fucksornot.com/api/vote/anonymous \
   -H "Content-Type: application/json" \
   -d '{
     "uploadId": "upload-uuid",
@@ -56,39 +56,42 @@ Successful votes return the vote record:
 ```json
 {
   "vote": {
-    "id": "vote-uuid",
-    "user_id": "user-uuid",
-    "upload_id": "upload-uuid",
-    "vote": "fucks",
-    "created_at": "2025-01-24T12:00:00Z"
+    "voteId": "vote-uuid",
+    "userId": "user-uuid",
+    "uploadId": "upload-uuid",
+    "vote": "fucks"
   }
 }
 ```
 
-## Getting Your Votes
+## Getting Your Vote on an Upload
 
-Retrieve all votes you've cast:
+Check whether you've voted on a specific upload by passing its `uploadId` as a query parameter:
 
 ```bash
-curl https://api.fucksornot.com/api/vote \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+curl "https://fucksornot.com/api/vote?uploadId=upload-uuid" \
+  -H "Cookie: auth-token=YOUR_JWT_TOKEN"
 ```
+
+`uploadId` is required — if it's omitted, the request returns a `400` error (`"Upload ID required"`).
 
 Response:
 
 ```json
 {
-  "votes": [
-    {
-      "id": "vote-uuid",
-      "user_id": "user-uuid",
-      "upload_id": "upload-uuid",
-      "vote": "fucks",
-      "created_at": "2025-01-24T12:00:00Z"
-    }
-  ]
+  "vote": "fucks"
 }
 ```
+
+If you haven't voted on that upload, `vote` is `null`:
+
+```json
+{
+  "vote": null
+}
+```
+
+This endpoint returns the current user's vote status for a single upload — it does not return a list of all votes the user has cast.
 
 ## Vote Counts
 
@@ -120,8 +123,8 @@ Voting is rate limited to prevent abuse:
 
 | Vote Type | Limit | Window |
 |-----------|-------|--------|
-| Authenticated | 20 votes | 1 hour |
-| Anonymous | Stricter | 1 hour |
+| Authenticated | 30 votes | 1 minute |
+| Anonymous | 10 votes | 1 minute |
 
 ## Shadow Banning
 

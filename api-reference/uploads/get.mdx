@@ -7,15 +7,22 @@ Retrieve details for a specific upload.
 
 ## Request
 
+Public uploads can be fetched without authentication. To access a private upload, include your `auth-token` cookie — only the owner or an admin can view it.
+
 <CodeGroup>
 
 ```bash cURL
-curl https://api.fucksornot.com/api/upload/550e8400-e29b-41d4-a716-446655440000
+curl https://fucksornot.com/api/upload/550e8400-e29b-41d4-a716-446655440000
+```
+
+```bash cURL (private upload)
+curl https://fucksornot.com/api/upload/550e8400-e29b-41d4-a716-446655440000 \
+  -H "Cookie: auth-token=YOUR_JWT_TOKEN"
 ```
 
 ```javascript JavaScript
 const response = await fetch(
-  'https://api.fucksornot.com/api/upload/550e8400-e29b-41d4-a716-446655440000'
+  'https://fucksornot.com/api/upload/550e8400-e29b-41d4-a716-446655440000'
 );
 const upload = await response.json();
 ```
@@ -44,7 +51,13 @@ const upload = await response.json();
       "slug": "gadget"
     }
   ],
-  "username": "johndoe"
+  "username": "johndoe",
+  "stats": {
+    "voteCount": 47,
+    "upvotes": 42,
+    "downvotes": 5,
+    "averageRating": 7.468085106382978
+  }
 }
 ```
 
@@ -65,6 +78,11 @@ const upload = await response.json();
 | `created_at` | timestamp | Creation time |
 | `tags` | array | Associated tags |
 | `username` | string | Uploader's username |
+| `stats` | object | Computed vote statistics, always present |
+| `stats.voteCount` | integer | Total number of votes (upvotes + downvotes) |
+| `stats.upvotes` | integer | "Fucks" vote count |
+| `stats.downvotes` | integer | "Does not fuck" vote count |
+| `stats.averageRating` | number \| null | Weighted average rating (upvotes weighted toward 10, downvotes toward 1); `null` if there are no votes |
 
 ## Access Control
 
