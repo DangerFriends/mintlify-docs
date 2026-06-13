@@ -20,7 +20,7 @@ Upload an image file directly to FoN.
 **Size limit:** 10 MB
 
 ```bash
-curl -X POST https://api.fucksornot.com/api/v1/upload \
+curl -X POST https://fucksornot.com/api/v1/upload \
   -H "Authorization: Bearer YOUR_API_TOKEN" \
   -F "upload_type=image" \
   -F "description=Check out this gadget" \
@@ -31,9 +31,13 @@ curl -X POST https://api.fucksornot.com/api/v1/upload \
 
 Submit a URL to an image hosted elsewhere. FoN will fetch and process the image.
 
+<Note>
+  Image URL uploads are only available via the cookie-authenticated `/api/upload` endpoint (not `/api/v1/upload`, which only accepts `image` or `link`).
+</Note>
+
 ```bash
-curl -X POST https://api.fucksornot.com/api/v1/upload \
-  -H "Authorization: Bearer YOUR_API_TOKEN" \
+curl -X POST https://fucksornot.com/api/upload \
+  -H "Cookie: auth-token=YOUR_JWT_TOKEN" \
   -F "upload_type=image_url" \
   -F "description=Cool find from the web" \
   -F "image_url=https://example.com/image.jpg"
@@ -52,7 +56,7 @@ Submit a link to external content. FoN supports rich embeds for popular platform
 - Spotify
 
 ```bash
-curl -X POST https://api.fucksornot.com/api/v1/upload \
+curl -X POST https://fucksornot.com/api/v1/upload \
   -H "Authorization: Bearer YOUR_API_TOKEN" \
   -F "upload_type=link" \
   -F "description=Great video" \
@@ -99,13 +103,21 @@ Uploaded images are automatically:
 
 ## Privacy
 
-Uploads can be set as private:
+Uploads can be made private. The privacy endpoint **toggles** the current setting — there's no request body, and calling it again switches it back:
 
 ```bash
-curl -X PATCH https://api.fucksornot.com/api/upload/UPLOAD_ID/privacy \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"is_private": true}'
+curl -X PATCH https://fucksornot.com/api/upload/UPLOAD_ID/privacy \
+  -H "Cookie: auth-token=YOUR_JWT_TOKEN"
+```
+
+This returns the updated upload along with its new privacy state:
+
+```json
+{
+  "success": true,
+  "upload": { /* ...updated upload object... */ },
+  "is_private": 1
+}
 ```
 
 Private uploads:
@@ -118,7 +130,7 @@ Private uploads:
 Add tags to help categorize your upload:
 
 ```bash
-curl -X POST https://api.fucksornot.com/api/v1/upload \
+curl -X POST https://fucksornot.com/api/v1/upload \
   -H "Authorization: Bearer YOUR_API_TOKEN" \
   -F "upload_type=image" \
   -F "description=My upload" \
@@ -139,8 +151,8 @@ Uploads are rate limited to **20 per hour** per user to prevent abuse.
 Users can delete their own uploads:
 
 ```bash
-curl -X DELETE https://api.fucksornot.com/api/upload/UPLOAD_ID \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+curl -X DELETE https://fucksornot.com/api/upload/UPLOAD_ID \
+  -H "Cookie: auth-token=YOUR_JWT_TOKEN"
 ```
 
 <Warning>

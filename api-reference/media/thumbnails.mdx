@@ -8,7 +8,7 @@ Retrieve a smaller thumbnail version of an image.
 ## Request
 
 ```bash
-curl https://api.fucksornot.com/api/thumbnail/550e8400-e29b-41d4-a716-446655440000
+curl https://fucksornot.com/api/thumbnail/550e8400-e29b-41d4-a716-446655440000
 ```
 
 ## Response
@@ -17,8 +17,19 @@ Returns a smaller, optimized version of the image.
 
 | Header | Value | Description |
 |--------|-------|-------------|
-| `Content-Type` | `image/webp` or `image/jpeg` | Image format |
-| `Cache-Control` | `public, max-age=31536000` | 1 year cache |
+| `Content-Type` | `image/webp` | Thumbnails are always encoded as WebP |
+| `Cache-Control` | `public, max-age=31536000, immutable` | 1 year, immutable cache for public uploads |
+| `CDN-Cache-Control` | `public, max-age=31536000, immutable` | 1 year, immutable cache at the CDN edge for public uploads |
+
+## Query Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `size` | integer | No | `200` | Target thumbnail size in pixels. Clamped to the range `50`-`400`. Values outside this range, or invalid/missing values, fall back to `200`. |
+
+```bash
+curl https://fucksornot.com/api/thumbnail/550e8400-e29b-41d4-a716-446655440000?size=100
+```
 
 ## Thumbnail vs Full Image
 
@@ -26,7 +37,7 @@ Returns a smaller, optimized version of the image.
 |-----------|-----------|------------|
 | Size | Smaller dimensions | Original dimensions |
 | Quality | Optimized for preview | Full quality |
-| Format | WebP or JPEG | Original format |
+| Format | Always WebP | Original format |
 | Use Case | Listings, previews | Detail view |
 
 ## Use Cases
@@ -40,18 +51,22 @@ Returns a smaller, optimized version of the image.
 
 ```html
 <!-- Thumbnail in listing -->
-<img src="https://api.fucksornot.com/api/thumbnail/upload-uuid"
+<img src="https://fucksornot.com/api/thumbnail/upload-uuid"
      alt="Preview"
      loading="lazy" />
 
 <!-- Link to full image -->
-<a href="https://api.fucksornot.com/api/image/upload-uuid">
-  <img src="https://api.fucksornot.com/api/thumbnail/upload-uuid" alt="Preview" />
+<a href="https://fucksornot.com/api/image/upload-uuid">
+  <img src="https://fucksornot.com/api/thumbnail/upload-uuid" alt="Preview" />
 </a>
 ```
 
 ## Access Control
 
-Same as full images:
 - **Public uploads**: Thumbnails accessible to everyone
-- **Private uploads**: Thumbnails only accessible to owner and admins
+- **Private uploads**: Thumbnails require authentication and ownership:
+  - No auth cookie/token present: returns `401 Unauthorized`
+  - Authenticated but not the owner: returns `403 Forbidden`
+  - There is no admin override - only the owner can access a private upload's thumbnail
+
+This differs from [`/api/image/{id}`](/api-reference/media/images), which returns `404 Not Found` for all unauthorized access to private images (including missing auth and non-owner requests) to avoid leaking whether an upload exists.

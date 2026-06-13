@@ -10,15 +10,13 @@ Verify if the current session is authenticated and retrieve user information.
 <CodeGroup>
 
 ```bash cURL
-curl https://api.fucksornot.com/api/auth/check \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+curl https://fucksornot.com/api/auth/check \
+  -H "Cookie: auth-token=YOUR_JWT_TOKEN"
 ```
 
 ```javascript JavaScript
-const response = await fetch('https://api.fucksornot.com/api/auth/check', {
-  headers: {
-    'Authorization': 'Bearer YOUR_JWT_TOKEN'
-  }
+const response = await fetch('https://fucksornot.com/api/auth/check', {
+  credentials: 'include'
 });
 ```
 
@@ -44,9 +42,13 @@ const response = await fetch('https://api.fucksornot.com/api/auth/check', {
 
 ### Not Authenticated
 
+If there is no valid `auth-token` cookie, the endpoint responds with a `401` error:
+
 ```json
 {
-  "authenticated": false
+  "statusCode": 401,
+  "statusMessage": "Unauthorized",
+  "message": "Not authenticated"
 }
 ```
 

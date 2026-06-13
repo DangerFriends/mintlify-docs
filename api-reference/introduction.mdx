@@ -8,27 +8,32 @@ description: 'Complete reference for the FoN API'
 The FoN API is a RESTful API that allows you to interact with the FoN platform programmatically. All requests should be made to the base URL:
 
 ```
-https://api.fucksornot.com
+https://fucksornot.com
 ```
 
 ## Authentication
 
-Most endpoints require authentication. The API supports multiple authentication methods:
+Most endpoints require authentication, using one of three mechanisms depending on the endpoint:
 
 <CardGroup cols={2}>
-  <Card title="Bearer Token" icon="key">
-    Pass a JWT or API token in the `Authorization` header
+  <Card title="Session Cookie" icon="cookie">
+    `Cookie: auth-token=<jwt>` — used by almost all endpoints (voting, tags, profile, uploads, MFA, password management, etc.)
   </Card>
-  <Card title="Cookie" icon="cookie">
-    Session cookie (`auth-token`) for browser-based requests
+  <Card title="JWT Bearer Token" icon="key">
+    `Authorization: Bearer <jwt>` — used only by the `/api/auth/tokens` token-management endpoints
+  </Card>
+  <Card title="API Token" icon="terminal">
+    `Authorization: Bearer <api_token>` — used only by `/api/v1/upload`
   </Card>
 </CardGroup>
 
 ```bash
-# Using Bearer token
-curl https://api.fucksornot.com/api/profile \
-  -H "Authorization: Bearer YOUR_TOKEN"
+# Using the session cookie (most endpoints)
+curl https://fucksornot.com/api/profile \
+  -H "Cookie: auth-token=YOUR_JWT_TOKEN"
 ```
+
+See the [Authentication guide](/authentication) for full details, and each endpoint's reference page for which mechanism it expects.
 
 ## Request Format
 
@@ -37,7 +42,7 @@ curl https://api.fucksornot.com/api/profile \
 For endpoints that accept JSON, set the `Content-Type` header:
 
 ```bash
-curl -X POST https://api.fucksornot.com/api/auth \
+curl -X POST https://fucksornot.com/api/auth \
   -H "Content-Type: application/json" \
   -d '{"action": "login", "email": "...", "password": "..."}'
 ```
@@ -47,8 +52,8 @@ curl -X POST https://api.fucksornot.com/api/auth \
 For file uploads, use `multipart/form-data`:
 
 ```bash
-curl -X POST https://api.fucksornot.com/api/upload \
-  -H "Authorization: Bearer YOUR_TOKEN" \
+curl -X POST https://fucksornot.com/api/upload \
+  -H "Cookie: auth-token=YOUR_JWT_TOKEN" \
   -F "upload_type=image" \
   -F "description=My upload" \
   -F "file=@image.jpg"
@@ -56,22 +61,24 @@ curl -X POST https://api.fucksornot.com/api/upload \
 
 ## Response Format
 
-All responses are returned as JSON:
+All responses are returned as JSON. There is no wrapper envelope — successful responses return the resource or domain object directly. For example, `GET /api/uploads` returns:
 
 ```json
 {
-  "data": { ... },
-  "error": null
+  "uploads": [...],
+  "page": 1,
+  "limit": 10
 }
 ```
 
 ### Error Responses
 
-Errors include a message describing the issue:
+Errors follow the standard Nitro/H3 error shape, with a `statusCode`, `statusMessage`, and a descriptive `message`:
 
 ```json
 {
-  "error": "unauthorized",
+  "statusCode": 401,
+  "statusMessage": "Unauthorized",
   "message": "Invalid or expired token"
 }
 ```
@@ -86,7 +93,6 @@ Errors include a message describing the issue:
 | `401` | Unauthorized - Authentication required |
 | `403` | Forbidden - Insufficient permissions |
 | `404` | Not Found - Resource doesn't exist |
-| `413` | Payload Too Large - File exceeds limit |
 | `429` | Too Many Requests - Rate limited |
 | `500` | Internal Server Error |
 
@@ -96,10 +102,11 @@ The API enforces rate limits to ensure fair usage:
 
 | Endpoint Category | Limit | Window |
 |-------------------|-------|--------|
-| Authentication | 5 requests | 15 minutes |
+| Authentication | 10 requests | 15 minutes |
 | Uploads | 20 requests | 1 hour |
-| Voting | 20 requests | 1 hour |
-| General | Standard | Rolling window |
+| Voting | 30 requests | 1 minute |
+| Anonymous voting | 10 requests | 1 minute |
+| General | 100 requests | 1 minute |
 
 When rate limited, you'll receive a `429` response with a `Retry-After` header.
 
@@ -110,10 +117,10 @@ List endpoints support pagination via query parameters:
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
 | `page` | integer | 1 | Page number (1-indexed) |
-| `limit` | integer | 12 | Items per page (max 50) |
+| `limit` | integer | 10 | Items per page (max 100) |
 
 ```bash
-curl "https://api.fucksornot.com/api/uploads?page=2&limit=20"
+curl "https://fucksornot.com/api/uploads?page=2&limit=20"
 ```
 
 Response includes pagination info:
@@ -168,8 +175,5 @@ The complete API is documented using OpenAPI 3.1. You can:
   </Card>
   <Card title="Media" icon="image" href="/api-reference/media/images">
     Image and thumbnail retrieval
-  </Card>
-  <Card title="Admin" icon="shield" href="/api-reference/admin/overview">
-    Administrative operations
   </Card>
 </CardGroup>
